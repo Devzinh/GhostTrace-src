@@ -11,71 +11,116 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      CONFIGURATION: Release
+      RUNTIME_ID: win-x64
+      PROJECT_VERSION: ${{ github.ref_name }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Normalize version from tag
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          if ($version.StartsWith('v')) {
+            $version = $version.Substring(1)
+          }
+
+          if (-not ($version -match '^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$')) {
+            throw "Tag inválida para release: ${{ github.ref_name }}. Use algo como v1.5.0"
+          }
+
+          "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
-      - name: Install WiX v4
-        run: dotnet tool install --global wix
+      - name: Restore solution
+        run: dotnet restore GhostTrace.sln
 
-      - name: Restore
-        run: dotnet restore
+      - name: Build solution
+        run: dotnet build GhostTrace.sln --configuration ${{ env.CONFIGURATION }} --no-restore -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
 
-      - name: Build main project
-        run: dotnet build --configuration Release --no-restore
+      - name: Publish CLI
+        run: >-
+          dotnet publish src/GhostTrace.CLI/GhostTrace.CLI.csproj
+          --configuration ${{ env.CONFIGURATION }}
+          --runtime ${{ env.RUNTIME_ID }}
+          --self-contained false
+          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
+          --output artifacts/publish/GhostTrace.CLI/${{ env.RUNTIME_ID }}
 
       - name: Build MSI pt-BR
-        run: |
-          dotnet build src/GhostTrace.Installer --configuration Release -p:Culture=pt-BR
-          $msi = Get-ChildItem -Path "src/GhostTrace.Installer/bin/x64/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
-          Write-Host "Found MSI: $($msi.FullName)"
-          Copy-Item $msi.FullName "GhostTrace-${{ github.ref_name }}-pt-BR-x64.msi"
+        run: >-
+          dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
+          --configuration ${{ env.CONFIGURATION }}
+          -p:Platform=x64
+          -p:MsiCulture=pt-BR
+          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
 
       - name: Build MSI en-US
-        run: |
-          dotnet build src/GhostTrace.Installer --configuration Release -p:Culture=en-US
-          $msi = Get-ChildItem -Path "src/GhostTrace.Installer/bin/x64/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
-          Write-Host "Found MSI: $($msi.FullName)"
-          Copy-Item $msi.FullName "GhostTrace-${{ github.ref_name }}-en-US-x64.msi"
+        run: >-
+          dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
+          --configuration ${{ env.CONFIGURATION }}
+          -p:Platform=x64
+          -p:MsiCulture=en-US
+          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
 
       - name: Build MSI es-ES
+        run: >-
+          dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
+          --configuration ${{ env.CONFIGURATION }}
+          -p:Platform=x64
+          -p:MsiCulture=es-ES
+          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
+
+      - name: Verify release assets
+        shell: pwsh
         run: |
-          dotnet build src/GhostTrace.Installer --configuration Release -p:Culture=es-ES
-          $msi = Get-ChildItem -Path "src/GhostTrace.Installer/bin/x64/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
-          Write-Host "Found MSI: $($msi.FullName)"
-          Copy-Item $msi.FullName "GhostTrace-${{ github.ref_name }}-es-ES-x64.msi"
+          $files = @(
+            "src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi",
+            "src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi",
+            "src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi"
+          )
+
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) {
+              throw "Arquivo não encontrado: $file"
+            }
+            Write-Host "OK: $file"
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "GhostTrace ${{ github.ref_name }}"
+          name: "GhostTrace v${{ env.PROJECT_VERSION }}"
           draft: true
           prerelease: false
           body: |
-            ## GhostTrace ${{ github.ref_name }}
+            ## GhostTrace v${{ env.PROJECT_VERSION }}
 
-            > "Desinstalou? Ele ainda ta aqui, bestinha."
+            > "Desinstalou? Ele ainda tá aqui, bestinha."
 
             ### Download
             Escolha o instalador no seu idioma:
 
             | Idioma | Arquivo |
             |--------|---------|
-            | Português Brasil | `GhostTrace-${{ github.ref_name }}-pt-BR-x64.msi` |
-            | English          | `GhostTrace-${{ github.ref_name }}-en-US-x64.msi` |
-            | Español          | `GhostTrace-${{ github.ref_name }}-es-ES-x64.msi` |
+            | Português Brasil | `GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi` |
+            | English          | `GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi` |
+            | Español          | `GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi` |
 
             ### Requisitos
             - Windows 10/11 x64
-            - .NET 10
+            - .NET 10 Desktop Runtime
             - Executar como Administrador (UAC necessário)
-
           files: |
-            GhostTrace-${{ github.ref_name }}-pt-BR-x64.msi
-            GhostTrace-${{ github.ref_name }}-en-US-x64.msi
-            GhostTrace-${{ github.ref_name }}-es-ES-x64.msi
+            src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi
+            src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi
+            src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi
