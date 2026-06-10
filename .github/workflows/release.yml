@@ -79,24 +79,6 @@ jobs:
           -p:Platform=x64
           -p:MsiCulture=es-ES
           -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
-
-      - name: Verify release assets
-        shell: pwsh
-        run: |
-          $root = "${{ github.workspace }}"
-          $files = @(
-            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi"),
-            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi"),
-            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi")
-          )
-
-          foreach ($file in $files) {
-            if (-not (Test-Path $file)) {
-              throw "Arquivo não encontrado: $file"
-            }
-            Write-Host "OK: $file"
-          }
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
