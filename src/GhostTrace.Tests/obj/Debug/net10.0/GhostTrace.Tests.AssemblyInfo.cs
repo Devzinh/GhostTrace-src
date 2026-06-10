@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GhostTrace.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a2f5da1bfe8d934d020e38fa0732b1889f696ba")]
 [assembly: System.Reflection.AssemblyProductAttribute("GhostTrace.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GhostTrace.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
