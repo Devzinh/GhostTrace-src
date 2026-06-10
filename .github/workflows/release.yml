@@ -83,10 +83,11 @@ jobs:
       - name: Verify release assets
         shell: pwsh
         run: |
+          $root = "${{ github.workspace }}"
           $files = @(
-            "src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi",
-            "src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi",
-            "src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi"
+            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi"),
+            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi"),
+            (Join-Path $root "src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi")
           )
 
           foreach ($file in $files) {
@@ -121,6 +122,6 @@ jobs:
             - .NET 10 Desktop Runtime
             - Executar como Administrador (UAC necessário)
           files: |
-            src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi
-            src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi
-            src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi
+            ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi
+            ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi
+            ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi
