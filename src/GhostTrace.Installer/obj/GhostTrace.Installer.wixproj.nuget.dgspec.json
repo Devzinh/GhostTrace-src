@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\roni9\\Desktop\\Desenvolvimento\\GhostTrace\\src\\GhostTrace.Installer\\GhostTrace.Installer.wixproj",
-        "projectName": "GhostTrace-1.5.0-es-ES-x64",
+        "projectName": "GhostTrace-1.5.0-en-US-x64",
         "projectPath": "C:\\Users\\roni9\\Desktop\\Desenvolvimento\\GhostTrace\\src\\GhostTrace.Installer\\GhostTrace.Installer.wixproj",
         "packagesPath": "C:\\Users\\roni9\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\roni9\\Desktop\\Desenvolvimento\\GhostTrace\\src\\GhostTrace.Installer\\obj\\",

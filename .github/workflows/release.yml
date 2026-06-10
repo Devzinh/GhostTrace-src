@@ -56,29 +56,21 @@ jobs:
           -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
           --output artifacts/publish/GhostTrace.CLI/${{ env.RUNTIME_ID }}
 
-      - name: Build MSI pt-BR
+      - name: Build MSI
         run: >-
           dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
           --configuration ${{ env.CONFIGURATION }}
           -p:Platform=x64
-          -p:MsiCulture=pt-BR
           -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
 
-      - name: Build MSI en-US
-        run: >-
-          dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
-          --configuration ${{ env.CONFIGURATION }}
-          -p:Platform=x64
-          -p:MsiCulture=en-US
-          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
-
-      - name: Build MSI es-ES
-        run: >-
-          dotnet build src/GhostTrace.Installer/GhostTrace.Installer.wixproj
-          --configuration ${{ env.CONFIGURATION }}
-          -p:Platform=x64
-          -p:MsiCulture=es-ES
-          -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
+      - name: Verify release assets
+        shell: pwsh
+        run: |
+          $file = Join-Path "${{ github.workspace }}" "src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi"
+          if (-not (Test-Path $file)) {
+            throw "Arquivo não encontrado: $file"
+          }
+          Write-Host "OK: $file"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -91,19 +83,13 @@ jobs:
             > "Desinstalou? Ele ainda tá aqui, bestinha."
 
             ### Download
-            Escolha o instalador no seu idioma:
+            [`GhostTrace-${{ env.PROJECT_VERSION }}-x64.msi`](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi)
 
-            | Idioma | Arquivo |
-            |--------|---------|
-            | Português Brasil | `GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi` |
-            | English          | `GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi` |
-            | Español          | `GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi` |
+            > O app detecta o idioma do Windows automaticamente (pt-BR, en-US, es-ES).
 
             ### Requisitos
             - Windows 10/11 x64
             - .NET 10 Desktop Runtime
             - Executar como Administrador (UAC necessário)
           files: |
-            ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/pt-BR/GhostTrace-${{ env.PROJECT_VERSION }}-pt-BR-x64.msi
             ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-en-US-x64.msi
-            ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/es-ES/GhostTrace-${{ env.PROJECT_VERSION }}-es-ES-x64.msi
