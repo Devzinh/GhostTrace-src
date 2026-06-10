@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
+  <String Id="LaunchRequiresWin" Value="GhostTrace requires Windows 10 / Server 2016 x64 or later." />
+  <String Id="OptActTitle" Value="Optional Actions" />
+  <String Id="OptActDesc" Value="Initialization and customization" />
+  <String Id="OptActStartMenu" Value="Create a Start Menu shortcut" />
+  <String Id="OptActDesktop" Value="Create a Desktop shortcut" />
+  <String Id="OptActPath" Value="Add GhostTrace to the system PATH" />
+  <String Id="OptActHint" Value="GhostTrace's scan is read-only and runs as Administrator. Reports are written to the directory you choose during a hunt." />
+  <String Id="LaunchAppText" Value="Launch GhostTrace now (Windows will ask for Administrator approval)" />
+</WixLocalization>

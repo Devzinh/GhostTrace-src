@@ -1,0 +1,196 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+    GhostTrace MSI package
+    ─────────────────────────────────────────────────────────────────
+    · Per-machine x64 install, major-upgrade aware
+    · PowerShell-style wizard: Welcome → License → Install Dir →
+      Optional Actions (checkboxes) → Install → Finish
+    · Optional actions are public properties that gate conditioned components
+    · ARP metadata: name, manufacturer, version, support URL, icon
+  -->
+
+  <Package Name="GhostTrace"
+           Manufacturer="GhostTrace Team"
+           Version="$(var.GhostTraceVersion)"
+           UpgradeCode="a06d8717-d2c6-4d69-a1b6-f5b2b2b1a1c3"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <SummaryInformation Description="GhostTrace Forensic Trace Hunter - read-only Windows artifact collector" />
+
+    <MajorUpgrade Schedule="afterInstallInitialize"
+                  DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Add/Remove Programs metadata -->
+    <Icon Id="GhostTraceIcon.ico" SourceFile="assets\GhostTrace.ico" />
+    <Property Id="ARPPRODUCTICON" Value="GhostTraceIcon.ico" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/ghosttrace" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/ghosttrace" />
+    <!-- ARPNOMODIFY=1 is already set by WixUI_InstallDir (single mandatory feature). -->
+
+    <Launch Condition="Installed OR (VersionNT64 &gt;= 603)"
+            Message="!(loc.LaunchRequiresWin)" />
+
+    <!-- Optional-action toggles (public so the custom dialog checkboxes can set them) -->
+    <Property Id="STARTMENUSHORTCUT" Value="1" Secure="yes" />
+    <Property Id="DESKTOPSHORTCUT" Value="0" Secure="yes" />
+    <Property Id="ADDTOPATH" Value="0" Secure="yes" />
+
+    <!-- Directory layout -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="GhostTrace" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="GhostTrace" />
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Single feature; optional pieces are gated by component conditions -->
+    <Feature Id="Core" Title="GhostTrace" Level="1" AllowAdvertise="no" AllowAbsent="no">
+      <ComponentGroupRef Id="GhostTraceCoreComponents" />
+      <ComponentRef Id="StartMenuShortcutComponent" />
+      <ComponentRef Id="StartMenuFolderCleanup" />
+      <ComponentRef Id="DesktopShortcutComponent" />
+      <ComponentRef Id="PathEnvironmentComponent" />
+    </Feature>
+
+    <!-- Wizard: WixUI_InstallDir + a custom Optional Actions dialog -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="assets\License.rtf" />
+    <WixVariable Id="WixUIBannerBmp"  Value="assets\Banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp"  Value="assets\Dialog.bmp" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <!-- "Launch GhostTrace" checkbox on the Finish page. WixShellExec uses
+         ShellExecute, so the exe's requireAdministrator manifest triggers the
+         normal UAC prompt instead of failing with ERROR_ELEVATION_REQUIRED. -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="!(loc.LaunchAppText)" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#MainExe]" />
+    <CustomAction Id="LaunchApplication" BinaryRef="Wix4UtilCA_X64" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <UI>
+      <!-- Optional Actions dialog (PowerShell-style checkbox page) -->
+      <Dialog Id="OptionalActionsDlg" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44"
+                 TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="280" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Title}!(loc.OptActTitle)" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="300" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="!(loc.OptActDesc)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+        <Control Id="StartMenuCheckBox" Type="CheckBox" X="22" Y="64" Width="320" Height="18"
+                 Property="STARTMENUSHORTCUT" CheckBoxValue="1"
+                 Text="!(loc.OptActStartMenu)" />
+        <Control Id="DesktopCheckBox" Type="CheckBox" X="22" Y="90" Width="320" Height="18"
+                 Property="DESKTOPSHORTCUT" CheckBoxValue="1"
+                 Text="!(loc.OptActDesktop)" />
+        <Control Id="PathCheckBox" Type="CheckBox" X="22" Y="116" Width="320" Height="18"
+                 Property="ADDTOPATH" CheckBoxValue="1"
+                 Text="!(loc.OptActPath)" />
+
+        <Control Id="Hint" Type="Text" X="22" Y="150" Width="326" Height="40" Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Normal}!(loc.OptActHint)" />
+
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="InstallDirDlg" />
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+      </Dialog>
+
+      <!-- Splice the dialog between InstallDirDlg and VerifyReadyDlg -->
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="OptionalActionsDlg"
+               Order="10" Condition="WIXUI_INSTALLDIR_VALID = &quot;1&quot;" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="OptionalActionsDlg"
+               Order="10" Condition="NOT Installed" />
+
+      <!-- Optional post-install launch (Finish-page checkbox) -->
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication"
+               Order="10" Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
+
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="GhostTraceCoreComponents">
+      <Component Id="MainExeComponent" Directory="INSTALLFOLDER" Bitness="always64" Guid="6c2f5a91-6f5f-4d2b-8a82-9d9c2d4e6f01">
+        <File Id="MainExe"
+              Source="..\..\artifacts\publish\GhostTrace.CLI\win-x64\GhostTrace.CLI.exe"
+              KeyPath="yes" />
+      </Component>
+      <ComponentGroupRef Id="GhostTraceDependencies" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="GhostTraceDependencies" Directory="INSTALLFOLDER">
+      <!-- Whole publish tree — the previous flat *.dll / *.json patterns silently
+           dropped the language satellite subfolders (cs, de, es, pt-BR, …) and any
+           nested dependency content. The main exe is carried by MainExeComponent. -->
+      <Files Include="..\..\artifacts\publish\GhostTrace.CLI\win-x64\**">
+        <Exclude Files="..\..\artifacts\publish\GhostTrace.CLI\win-x64\GhostTrace.CLI.exe" />
+        <Exclude Files="..\..\artifacts\publish\GhostTrace.CLI\win-x64\**\*.pdb" />
+      </Files>
+    </ComponentGroup>
+
+    <!-- Start Menu shortcut (only when the checkbox is ticked) -->
+    <Component Id="StartMenuShortcutComponent" Directory="ApplicationProgramsFolder" Bitness="always64"
+               Guid="b37a1f59-21c8-472e-8367-e9a9412f1db1"
+               Condition="STARTMENUSHORTCUT = &quot;1&quot;">
+      <Shortcut Id="AppStartMenuShortcut"
+                Name="GhostTrace Forensic Console"
+                Description="Read-only Windows forensic trace hunter"
+                Target="[INSTALLFOLDER]GhostTrace.CLI.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="GhostTraceIcon.ico" />
+      <RegistryValue Root="HKCU" Key="Software\GhostTrace\Shortcuts" Name="StartMenu"
+                     Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="StartMenuFolderCleanup" Directory="ApplicationProgramsFolder" Bitness="always64"
+               Guid="c8e1a7d2-3b4c-4f50-9d1a-7e9f3b2c1a05"
+               Condition="STARTMENUSHORTCUT = &quot;1&quot;">
+      <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\GhostTrace\Shortcuts" Name="MenuFolder"
+                     Type="integer" Value="1" KeyPath="yes" />
+      <!-- Drop the whole per-user marker key so uninstall leaves no orphan. -->
+      <RemoveRegistryKey Action="removeOnUninstall" Root="HKCU" Key="Software\GhostTrace" />
+    </Component>
+
+    <!-- Desktop shortcut (only when the checkbox is ticked) -->
+    <Component Id="DesktopShortcutComponent" Directory="DesktopFolder" Bitness="always64"
+               Guid="d4f2b189-5a6c-4e3d-b1f8-2c8a9f6e1d0b"
+               Condition="DESKTOPSHORTCUT = &quot;1&quot;">
+      <Shortcut Id="AppDesktopShortcut"
+                Name="GhostTrace"
+                Description="Read-only Windows forensic trace hunter"
+                Target="[INSTALLFOLDER]GhostTrace.CLI.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="GhostTraceIcon.ico" />
+      <RegistryValue Root="HKCU" Key="Software\GhostTrace\Shortcuts" Name="Desktop"
+                     Type="integer" Value="1" KeyPath="yes" />
+      <RemoveRegistryKey Action="removeOnUninstall" Root="HKCU" Key="Software\GhostTrace" />
+    </Component>
+
+    <!-- Add install dir to system PATH (only when the checkbox is ticked) -->
+    <Component Id="PathEnvironmentComponent" Directory="INSTALLFOLDER" Bitness="always64"
+               Guid="e9a3c821-7d4b-4f5e-a2c9-1b8d6f4e3c2a"
+               Condition="ADDTOPATH = &quot;1&quot;">
+      <Environment Id="GhostTracePath" Name="PATH" Value="[INSTALLFOLDER]"
+                   Permanent="no" Part="last" Action="set" System="yes" />
+      <RegistryValue Root="HKLM" Key="Software\GhostTrace" Name="PathRegistered"
+                     Type="integer" Value="1" KeyPath="yes" />
+      <RemoveRegistryKey Action="removeOnUninstall" Root="HKLM" Key="Software\GhostTrace" />
+    </Component>
+  </Fragment>
+</Wix>

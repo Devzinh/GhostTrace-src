@@ -1,0 +1,35 @@
+<svg width="1280" height="380" viewBox="0 0 1280 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Workflow do GhostTrace</title>
+  <desc id="desc">Fluxo de uso da ferramenta</desc>
+  <rect width="1280" height="380" rx="24" fill="#0D1528"/>
+
+  <text x="60" y="62" fill="#EAF5FF" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700">Fluxo de Investigacao em 4 Etapas</text>
+
+  <g>
+    <rect x="60" y="110" width="260" height="190" rx="20" fill="#1A2948"/>
+    <text x="84" y="168" fill="#8EE3FF" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">1. Nome do alvo</text>
+    <text x="84" y="206" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">Digite o software</text>
+    <text x="84" y="234" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">ex: nvidia, anydesk</text>
+
+    <rect x="360" y="110" width="260" height="190" rx="20" fill="#1A2948"/>
+    <text x="384" y="168" fill="#8EE3FF" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">2. Caca completa</text>
+    <text x="384" y="206" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">22 modulos varrem</text>
+    <text x="384" y="234" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">artefatos forenses</text>
+
+    <rect x="660" y="110" width="260" height="190" rx="20" fill="#1A2948"/>
+    <text x="684" y="168" fill="#8EE3FF" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">3. Resultado claro</text>
+    <text x="684" y="206" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">Tabela consolidada</text>
+    <text x="684" y="234" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">com contexto tecnico</text>
+
+    <rect x="960" y="110" width="260" height="190" rx="20" fill="#1A2948"/>
+    <text x="984" y="168" fill="#8EE3FF" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">4. Limpeza opcional</text>
+    <text x="984" y="206" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">Selecione o que remover</text>
+    <text x="984" y="234" fill="#D2E9FF" font-family="Segoe UI, Arial, sans-serif" font-size="19">com confirmacao e log</text>
+  </g>
+
+  <g stroke="#49C5FF" stroke-width="3" stroke-linecap="round">
+    <path d="M320 205H356"/>
+    <path d="M620 205H656"/>
+    <path d="M920 205H956"/>
+  </g>
+</svg>

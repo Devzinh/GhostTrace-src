@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\GhostTrace.Core\GhostTrace.Core.csproj" />
+    <ProjectReference Include="..\GhostTrace.Modules\GhostTrace.Modules.csproj" />
+    <ProjectReference Include="..\GhostTrace.Analysis\GhostTrace.Analysis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.55.2" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Embed the UAC manifest so the app always launches elevated -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Product / file metadata surfaced in Explorer and Add/Remove Programs -->
+    <AssemblyName>GhostTrace.CLI</AssemblyName>
+    <Product>GhostTrace</Product>
+    <Company>GhostTrace Team</Company>
+    <Description>Read-only Windows forensic scanner</Description>
+    <!-- Version comes from Directory.Build.props (GhostTraceVersion). -->
+    <Version>$(GhostTraceVersion)</Version>
+    <FileVersion>$(GhostTraceVersion).0</FileVersion>
+    <AssemblyVersion>$(GhostTraceVersion).0</AssemblyVersion>
+  </PropertyGroup>
+
+</Project>

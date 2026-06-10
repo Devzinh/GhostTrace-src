@@ -1,0 +1,21 @@
+<Project Sdk="WixToolset.Sdk/5.0.1">
+  <PropertyGroup>
+    <!-- Version comes from the repo-root Directory.Build.props; the fallback only
+         protects a stand-alone build of this project outside the repo tree. -->
+    <GhostTraceVersion Condition="'$(GhostTraceVersion)' == ''">1.5.0</GhostTraceVersion>
+    <Platform>x64</Platform>
+
+    <!-- Localized installer: pass -p:MsiCulture=pt-BR|es-ES|en-US to build each MSI. -->
+    <MsiCulture Condition="'$(MsiCulture)' == ''">en-US</MsiCulture>
+    <Cultures>$(MsiCulture)</Cultures>
+
+    <OutputName>GhostTrace-$(GhostTraceVersion)-$(MsiCulture)-x64</OutputName>
+    <SuppressIces>ICE38;ICE43;ICE57;ICE69;ICE80</SuppressIces>
+    <DefineConstants>GhostTraceVersion=$(GhostTraceVersion)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.1" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.1" />
+  </ItemGroup>
+</Project>

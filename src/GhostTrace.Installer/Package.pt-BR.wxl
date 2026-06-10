@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="pt-BR" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="DowngradeError" Value="Uma versão mais recente do [ProductName] já está instalada." />
+  <String Id="LaunchRequiresWin" Value="GhostTrace requer Windows 10 / Server 2016 x64 ou superior." />
+  <String Id="OptActTitle" Value="Ações Opcionais" />
+  <String Id="OptActDesc" Value="Inicialização e personalização" />
+  <String Id="OptActStartMenu" Value="Criar atalho no Menu Iniciar" />
+  <String Id="OptActDesktop" Value="Criar atalho na Área de Trabalho" />
+  <String Id="OptActPath" Value="Adicionar GhostTrace ao PATH do sistema" />
+  <String Id="OptActHint" Value="A varredura do GhostTrace é somente leitura e roda como Administrador. Os relatórios são gravados no diretório escolhido durante a busca." />
+  <String Id="LaunchAppText" Value="Iniciar o GhostTrace agora (o Windows pedirá aprovação de Administrador)" />
+</WixLocalization>

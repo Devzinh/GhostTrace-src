@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- Single source of truth for the product version. Consumed by
+         GhostTrace.CLI.csproj (assembly/file version) and by
+         GhostTrace.Installer.wixproj (MSI ProductVersion + file name).
+         Bump it here and every artifact stays in sync. -->
+    <GhostTraceVersion>1.5.0</GhostTraceVersion>
+  </PropertyGroup>
+</Project>
