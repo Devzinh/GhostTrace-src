@@ -16,16 +16,13 @@ public sealed class ScheduledTasksScanModuleTests
         if (!OperatingSystem.IsWindows())
             return;
 
-        // Arrange
         var module = new ScheduledTasksScanModule();
         var options = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
         var context = new FakeScanContext(module.Name, options);
         var pipeline = new ScanPipeline([module]);
 
-        // Act
         var results = await pipeline.ExecuteAsync(context, CancellationToken.None);
 
-        // Assert
         Assert.NotNull(results);
         Assert.Single(results);
         
@@ -45,7 +42,6 @@ public sealed class ScheduledTasksScanModuleTests
         if (!OperatingSystem.IsWindows())
             return;
 
-        // Arrange
         var module = new ScheduledTasksScanModule();
         var options = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
         var context = new FakeScanContext(module.Name, options);
@@ -54,7 +50,6 @@ public sealed class ScheduledTasksScanModuleTests
         using var cts = new CancellationTokenSource();
         cts.Cancel(); 
 
-        // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(() => pipeline.ExecuteAsync(context, cts.Token));
     }
 }

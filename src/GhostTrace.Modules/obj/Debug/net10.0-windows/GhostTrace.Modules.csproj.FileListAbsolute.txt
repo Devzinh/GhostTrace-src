@@ -1,5 +1,0 @@
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Modules\obj\Debug\net10.0-windows\GhostTrace.Modules.csproj.AssemblyReference.cache
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Modules\obj\Debug\net10.0-windows\GhostTrace.Modules.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Modules\obj\Debug\net10.0-windows\GhostTrace.Modules.AssemblyInfoInputs.cache
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Modules\obj\Debug\net10.0-windows\GhostTrace.Modules.AssemblyInfo.cs
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Modules\obj\Debug\net10.0-windows\GhostTrace.Modules.csproj.CoreCompileInputs.cache

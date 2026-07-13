@@ -1,0 +1,32 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+
+# .NET / MSBuild
+*.user
+*.suo
+*.userprefs
+project.lock.json
+project.nuget.cache
+*.nuget.props
+*.nuget.targets
+
+# Publish / packaging output
+publish/
+*.msi
+*.nupkg
+
+# IDE / OS
+.vs/
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Test / coverage output
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.trx

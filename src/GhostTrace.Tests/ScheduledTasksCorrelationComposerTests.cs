@@ -34,7 +34,6 @@ public sealed class ScheduledTasksCorrelationComposerTests
     [Fact]
     public void Compose_NormalCorrelation_ShouldAggregateMetadataCorrectly()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe")
@@ -47,10 +46,8 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
-        // Assert
         Assert.NotNull(correlationResult);
         Assert.Equal("ScheduledTasksCorrelationComposer", correlationResult.ComponentName);
         Assert.Empty(correlationResult.Warnings);
@@ -72,7 +69,6 @@ public sealed class ScheduledTasksCorrelationComposerTests
     [Fact]
     public void Compose_WithEmptyComResult_ShouldProduceWarningsAndInconclusiveResult()
     {
-        // Arrange
         var comResult = CreateFakeResult("ScheduledTasksScanModule", new List<ScanFinding>().AsReadOnly());
         var regFindings = new List<ScanFinding>
         {
@@ -80,10 +76,8 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
-        // Assert
         Assert.NotEmpty(correlationResult.Warnings);
         Assert.Contains(correlationResult.Warnings, w => w.Contains("COM findings are empty"));
         
@@ -114,7 +108,6 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
         // Assert: missing coverage must not be labelled a high-severity ghost task.
@@ -148,10 +141,8 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
-        // Assert
         var finding = Assert.Single(correlationResult.CorrelatedFindings);
         Assert.Equal("GhostCandidate-DegradedEvidence", finding.Label);
     }
@@ -176,10 +167,8 @@ public sealed class ScheduledTasksCorrelationComposerTests
             status: ScanStatus.PartialSuccess,
             errors: new List<string> { "Access denied opening subkey 'Tree\\Hidden': denied" }.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
-        // Assert
         Assert.Contains(correlationResult.Warnings, w => w.Contains("Registry collection is degraded"));
         Assert.Contains(correlationResult.CorrelatedFindings, f => f.Label == "DegradedRegistryCoverage");
     }
@@ -200,7 +189,6 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
         // Assert: no per-task ghost labels — only a global inconclusive verdict.
@@ -214,7 +202,6 @@ public sealed class ScheduledTasksCorrelationComposerTests
     [Fact]
     public void Compose_WithInvalidCategories_ShouldFilterAndWarn()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("FilesystemEntry", "BadFile", @"C:\BadFile", null, "File")
@@ -227,10 +214,8 @@ public sealed class ScheduledTasksCorrelationComposerTests
         };
         var regResult = CreateFakeResult("RegistryScanModule", regFindings.AsReadOnly());
 
-        // Act
         var correlationResult = _composer.Compose(comResult, regResult);
 
-        // Assert
         Assert.NotEmpty(correlationResult.Warnings);
         Assert.Contains(correlationResult.Warnings, w => w.Contains("Filtered out"));
         

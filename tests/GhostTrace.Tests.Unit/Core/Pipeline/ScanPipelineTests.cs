@@ -15,7 +15,6 @@ public class ScanPipelineTests
     [Fact]
     public async Task ExecuteAsync_RunsModulesSequentially_AndPreservesOrder()
     {
-        // Arrange
         var context = new EmptyScanContext();
         var module1 = new FakeScanModule("Module1", ScanStatus.Success);
         var module2 = new FakeScanModule("Module2", ScanStatus.PartialSuccess);
@@ -23,10 +22,8 @@ public class ScanPipelineTests
 
         var pipeline = new ScanPipeline(new IScanModule[] { module1, module2, module3 });
 
-        // Act
         var results = await pipeline.ExecuteAsync(context);
 
-        // Assert
         Assert.Equal(3, results.Count);
         Assert.Equal(ScanStatus.Success, results[0].Status);
         Assert.Equal(ScanStatus.PartialSuccess, results[1].Status);

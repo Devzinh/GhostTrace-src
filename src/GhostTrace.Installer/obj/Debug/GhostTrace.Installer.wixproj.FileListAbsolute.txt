@@ -1,6 +1,0 @@
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\bin\Debug\en-US\GhostTrace-1.5.0-en-US-x64.msi
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\bin\Debug\en-US\GhostTrace-1.5.0-en-US-x64.wixpdb
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\obj\Debug\GhostTrace.Installer.wixproj.CoreCompileInputs.cache
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\obj\Debug\en-US\GhostTrace-1.5.0-en-US-x64.msi
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\obj\Debug\en-US\GhostTrace-1.5.0-en-US-x64.wixpdb
-C:\Users\roni9\Desktop\Desenvolvimento\GhostTrace\src\GhostTrace.Installer\obj\Debug\GhostTrace.Installer.wixproj.BindTracking-en-US.txt

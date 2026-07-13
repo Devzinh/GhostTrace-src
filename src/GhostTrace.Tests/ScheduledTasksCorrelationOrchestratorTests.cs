@@ -15,7 +15,6 @@ public sealed class ScheduledTasksCorrelationOrchestratorTests
     [SupportedOSPlatform("windows")]
     public async Task RunCorrelationAsync_WithMockedModules_ShouldProduceValidCorrelationResult()
     {
-        // Arrange
         var orchestrator = new ScheduledTasksCorrelationOrchestrator();
 
         var comContext = new FakeScanContext(
@@ -45,7 +44,6 @@ public sealed class ScheduledTasksCorrelationOrchestratorTests
         };
         var regModule = new FakeScanModule("TaskCacheScanModule", regFindings.AsReadOnly());
 
-        // Act
         var result = await orchestrator.RunCorrelationAsync(
             comContext,
             regContext,
@@ -54,7 +52,6 @@ public sealed class ScheduledTasksCorrelationOrchestratorTests
             CancellationToken.None
         )!;
 
-        // Assert
         Assert.NotNull(result);
         Assert.Equal("ScheduledTasksCorrelationComposer", result.ComponentName);
         Assert.Empty(result.Warnings);

@@ -14,7 +14,6 @@ public static class CsvReportWriter
     {
         var sb = new StringBuilder();
 
-        // Header
         sb.AppendLine("Module,Category,Description,Source,TimestampUtc,RawValue,IsMatch,Status");
 
         foreach (var m in report.ModuleResults)

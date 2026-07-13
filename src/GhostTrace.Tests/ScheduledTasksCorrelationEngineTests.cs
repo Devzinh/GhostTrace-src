@@ -16,7 +16,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_MissingSdWithoutCom_ShouldReturnHighGhostCandidate()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>(); // COM is missing this task, but NOT empty globally
         comFindings.Add(new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe"));
 
@@ -25,10 +24,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "GhostTask", $@"{RegPrefix}GhostTask", null, "Id: {...} | HasSD: False | ANOMALIES: MISSING_SD (Ghost Task Indicator)")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings);
 
-        // Assert
         Assert.Single(results);
         var result = results[0];
         Assert.Equal(@"\ghosttask", result.LogicalPath);
@@ -41,7 +38,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_ZeroIndexWithoutCom_ShouldReturnHighGhostCandidate()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe")
@@ -52,10 +48,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "IndexTask", $@"{RegPrefix}IndexTask", null, "Id: {...} | HasSD: True | ANOMALIES: MISSING_OR_ZERO_INDEX")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings);
 
-        // Assert
         Assert.Single(results);
         var result = results[0];
         Assert.Equal(@"\indextask", result.LogicalPath);
@@ -66,7 +60,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_AnomalyWithCom_ShouldReturnMediumStructuralAnomaly()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "BrokenTask", @"\BrokenTask", null, "COM sees this")
@@ -77,10 +70,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "BrokenTask", $@"{RegPrefix}BrokenTask", null, "Id: {...} | HasSD: False | ANOMALIES: MISSING_SD")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings);
 
-        // Assert
         Assert.Single(results);
         var result = results[0];
         Assert.Equal(@"\brokentask", result.LogicalPath);
@@ -93,7 +84,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_TaskCacheNormalWithoutCom_ShouldReturnStructuralOnly()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe")
@@ -104,10 +94,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "OrphanTask", $@"{RegPrefix}OrphanTask", null, "Id: {...} | HasSD: True")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings);
 
-        // Assert
         Assert.Single(results);
         var result = results[0];
         Assert.Equal(@"\orphantask", result.LogicalPath);
@@ -130,7 +118,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "GhostTask", $@"{RegPrefix}GhostTask", null, "Id: {...} | HasSD: False | ANOMALIES: MISSING_SD (Ghost Task Indicator)")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings, comCollectionDegraded: true, regCollectionDegraded: false);
 
         // Assert: absence from a partially-enumerated COM view is degraded evidence.
@@ -144,7 +131,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_StructuralOnly_WithDegradedComCollection_ShouldDowngradeToInfo()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe")
@@ -155,10 +141,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "OrphanTask", $@"{RegPrefix}OrphanTask", null, "Id: {...} | HasSD: True")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings, comCollectionDegraded: true, regCollectionDegraded: false);
 
-        // Assert
         Assert.Single(results);
         Assert.Equal("StructuralOnly-DegradedEvidence", results[0].Label);
         Assert.Equal(CorrelationSeverity.Info, results[0].Severity);
@@ -179,10 +163,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "BrokenTask", $@"{RegPrefix}BrokenTask", null, "Id: {...} | HasSD: False | ANOMALIES: MISSING_SD")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings, comCollectionDegraded: true, regCollectionDegraded: true);
 
-        // Assert
         var anomaly = Assert.Single(results, r => r.Label == "StructuralAnomaly");
         Assert.Equal(CorrelationSeverity.Medium, anomaly.Severity);
     }
@@ -190,7 +172,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_WithDegradedRegistryCollection_ShouldEmitGlobalCoverageWarning()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>
         {
             new ScanFinding("ScheduledTask", "SafeTask", @"\SafeTask", null, "Safe")
@@ -200,10 +181,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "SafeTask", $@"{RegPrefix}SafeTask", null, "Id: {...} | HasSD: True")
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings, comCollectionDegraded: false, regCollectionDegraded: true);
 
-        // Assert
         var coverage = Assert.Single(results, r => r.Label == "DegradedRegistryCoverage");
         Assert.Equal("<GLOBAL>", coverage.LogicalPath);
         Assert.Equal(CorrelationSeverity.Info, coverage.Severity);
@@ -212,7 +191,6 @@ public sealed class ScheduledTasksCorrelationEngineTests
     [Fact]
     public void Correlate_GlobalEmptyCom_ShouldNotGenerateAvalancheOfGhosts()
     {
-        // Arrange
         var comFindings = new List<ScanFinding>(); // Globally empty!
         
         var regFindings = new List<ScanFinding>
@@ -221,10 +199,8 @@ public sealed class ScheduledTasksCorrelationEngineTests
             new ScanFinding("ScheduledTaskCacheEntry", "Task2", $@"{RegPrefix}Task2", null, "Id: {...} | HasSD: True"),
         };
 
-        // Act
         var results = _engine.Correlate(comFindings, regFindings);
 
-        // Assert
         Assert.Single(results);
         var result = results[0];
         Assert.Equal("<GLOBAL>", result.LogicalPath);

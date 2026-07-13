@@ -17,7 +17,6 @@ public sealed class RegistryScanModuleTests
         if (!OperatingSystem.IsWindows())
             return;
 
-        // Arrange
         var module = new RegistryScanModule();
         
         // HKEY_CURRENT_USER\Environment is safe and normally accessible without Admin rights
@@ -30,10 +29,8 @@ public sealed class RegistryScanModuleTests
         var context = new FakeScanContext(module.Name, new ReadOnlyDictionary<string, string>(options));
         var pipeline = new ScanPipeline([module]);
 
-        // Act
         var results = await pipeline.ExecuteAsync(context, CancellationToken.None);
 
-        // Assert
         Assert.NotNull(results);
         Assert.Single(results);
         var result = results[0];

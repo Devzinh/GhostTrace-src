@@ -11,15 +11,12 @@ public sealed class ScanPipelineTests
     [Fact]
     public async Task ExecuteAsync_WithEchoModule_ShouldReturnSuccessAndMetadata()
     {
-        // Arrange
         var module = new EchoScanModule();
         var pipeline = new ScanPipeline([module]);
         var context = new FakeScanContext("EchoScanModule", new ReadOnlyDictionary<string, string>(new Dictionary<string, string>()));
 
-        // Act
         var results = await pipeline.ExecuteAsync(context, CancellationToken.None);
 
-        // Assert
         Assert.NotNull(results);
         Assert.Single(results);
         var result = results[0];
@@ -30,7 +27,6 @@ public sealed class ScanPipelineTests
     [Fact]
     public async Task ExecuteAsync_WithCancelledToken_ShouldThrowOperationCanceledException()
     {
-        // Arrange
         var module = new EchoScanModule();
         var pipeline = new ScanPipeline([module]);
         var context = new FakeScanContext("EchoScanModule", new ReadOnlyDictionary<string, string>(new Dictionary<string, string>()));
@@ -38,7 +34,6 @@ public sealed class ScanPipelineTests
         using var cts = new CancellationTokenSource();
         cts.Cancel(); // Already cancelled
 
-        // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(() => pipeline.ExecuteAsync(context, cts.Token));
     }
 }
