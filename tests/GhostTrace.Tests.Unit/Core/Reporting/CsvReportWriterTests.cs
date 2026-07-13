@@ -54,4 +54,40 @@ public class CsvReportWriterTests
             if (File.Exists(tempFile)) File.Delete(tempFile);
         }
     }
+
+    [Theory]
+    [InlineData("=1+1")]
+    [InlineData("+1+1")]
+    [InlineData("-1+1")]
+    [InlineData("@SUM(A1:A2)")]
+    public void Write_PrefixesSpreadsheetFormulas(string untrustedValue)
+    {
+        string tempFile = Path.GetTempFileName() + ".csv";
+        try
+        {
+            var finding = new ScanFinding("File", untrustedValue, "source", null, null);
+            var report = new FullScanReport
+            {
+                ModuleResults = new List<ModuleScanResult>
+                {
+                    new()
+                    {
+                        ModuleName = "Mod",
+                        Status = ScanStatus.Success,
+                        Findings = new List<ScanFinding> { finding }.AsReadOnly(),
+                        MatchedFindings = new List<ScanFinding>().AsReadOnly(),
+                        Errors = new List<string>().AsReadOnly()
+                    }
+                }.AsReadOnly()
+            };
+
+            CsvReportWriter.Write(report, tempFile);
+
+            Assert.Contains("'" + untrustedValue, File.ReadAllText(tempFile));
+        }
+        finally
+        {
+            if (File.Exists(tempFile)) File.Delete(tempFile);
+        }
+    }
 }

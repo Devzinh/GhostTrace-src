@@ -105,7 +105,8 @@ internal static class TraceCleaner
         string name;
         try { name = Path.GetFileName(f.Source.TrimEnd('\\', '/')); }
         catch { return false; }
-        return !string.IsNullOrEmpty(name) && name.Contains(targetName, StringComparison.OrdinalIgnoreCase);
+             return !string.IsNullOrEmpty(name) &&
+                 string.Equals(name, targetName, StringComparison.OrdinalIgnoreCase);
     }
 
     private static CleanupOutcome RemoveFilesystem(string path)
@@ -119,6 +120,10 @@ internal static class TraceCleaner
             {
                 return new CleanupOutcome(CleanupStatus.Skipped, string.Format(Loc.Current.BlockedDirFmt, path));
             }
+            if (IsReparsePoint(path))
+            {
+                return new CleanupOutcome(CleanupStatus.Skipped, string.Format(Loc.Current.BlockedDirFmt, path));
+            }
             Directory.Delete(path, recursive: true);
             return new CleanupOutcome(CleanupStatus.Removed, path);
         }
@@ -129,6 +134,10 @@ internal static class TraceCleaner
             // persistence entries) may be deleted. A name match inside an unrelated
             // shared path is rejected.
             if (!IsTrustedRemovableFile(path))
+            {
+                return new CleanupOutcome(CleanupStatus.Skipped, string.Format(Loc.Current.BlockedDirFmt, path));
+            }
+            if (IsReparsePoint(path))
             {
                 return new CleanupOutcome(CleanupStatus.Skipped, string.Format(Loc.Current.BlockedDirFmt, path));
             }
@@ -245,5 +254,17 @@ internal static class TraceCleaner
     {
         try { return Directory.Exists(path); }
         catch { return false; }
+    }
+
+    private static bool IsReparsePoint(string path)
+    {
+        try
+        {
+            return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
+        }
+        catch
+        {
+            return true;
+        }
     }
 }

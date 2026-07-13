@@ -268,7 +268,10 @@ public class ScanCommand : Command
         if (quiet)
         {
             // Non-interactive (scripting): always write the .txt record, no cleanup.
-            TryWriteReport(fullReport, txtFilePath, quiet: true);
+            if (!TryWriteReport(fullReport, txtFilePath, quiet: true))
+            {
+                return 2;
+            }
         }
         else
         {

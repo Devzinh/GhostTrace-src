@@ -41,6 +41,11 @@ public static class CsvReportWriter
         if (string.IsNullOrEmpty(value))
             return string.Empty;
 
+        // Spreadsheet applications evaluate cells beginning with these characters as
+        // formulas. Artifact data is untrusted, so force a literal text cell.
+        if (value[0] is '=' or '+' or '-' or '@')
+            value = "'" + value;
+
         var needsQuotes = value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r');
         if (!needsQuotes)
             return value;

@@ -80,11 +80,11 @@ public sealed class FileSystemTraceScanModule : IScanModule
                     if (fileName.Contains(target, StringComparison.OrdinalIgnoreCase))
                     {
                         // Same product-owned confidence rule as folders: only a file
-                        // sitting directly in a curated root whose name starts with
+                        // sitting directly in a curated root whose name exactly matches
                         // the target is removable. A name hit inside an unrelated
                         // shared path is a report-only hint.
                         bool highConfidence = depth == 0 &&
-                            fileName.StartsWith(target, StringComparison.OrdinalIgnoreCase);
+                            string.Equals(fileName, target, StringComparison.OrdinalIgnoreCase);
 
                         AddFileTrace(builder, file, highConfidence);
                         matches++;
@@ -108,11 +108,11 @@ public sealed class FileSystemTraceScanModule : IScanModule
                 if (folderName.Contains(target, StringComparison.OrdinalIgnoreCase))
                 {
                     // Only a folder that sits directly under a curated root AND whose
-                    // name starts with the target is a high-confidence product-owned
+                    // name exactly matches the target is a high-confidence product-owned
                     // leftover. Deeper or loose substring hits are report-only hints —
                     // a substring like "edge" must never mark a shared folder removable.
                     bool highConfidence = depth == 0 &&
-                        folderName.StartsWith(target, StringComparison.OrdinalIgnoreCase);
+                        string.Equals(folderName, target, StringComparison.OrdinalIgnoreCase);
 
                     AddFolderTrace(builder, sub, highConfidence);
                     matches++;

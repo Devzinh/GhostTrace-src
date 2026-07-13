@@ -46,6 +46,6 @@ internal static class SingleModuleJsonRunner
             ScanId: scanId,
             GeneratedAtUtc: DateTimeOffset.UtcNow);
 
-        return await JsonReportHelper.TryWriteReportAsync(outputInfo, descriptor, results);
+        return await JsonReportHelper.TryWriteReportAsync(outputInfo, descriptor, results, cancellationToken);
     }
 }
