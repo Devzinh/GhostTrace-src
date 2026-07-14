@@ -152,7 +152,10 @@ GhostTrace e um coletor **somente leitura por padrao**. A limpeza foi desenhada 
 
 ## Historico de estrelas
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Devzinh/GhostTrace-src&type=Date)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+[![Estrelas no GitHub](https://img.shields.io/github/stars/Devzinh/GhostTrace-src?style=flat-square&label=estrelas%20no%20GitHub)](https://github.com/Devzinh/GhostTrace-src/stargazers)
+[![Star History](https://img.shields.io/badge/Star%20History-ver%20crescimento-1F8FFF?style=flat-square)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+
+Acompanhe o historico publico de estrelas no [Star History](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src).
 
 ## Documentacao
 

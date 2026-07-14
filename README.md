@@ -158,7 +158,10 @@ GhostTrace is a **read-only collector by default**. Its cleanup workflow targets
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Devzinh/GhostTrace-src&type=Date)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Devzinh/GhostTrace-src?style=flat-square&label=GitHub%20stars)](https://github.com/Devzinh/GhostTrace-src/stargazers)
+[![Star History](https://img.shields.io/badge/Star%20History-view%20growth-1F8FFF?style=flat-square)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+
+Track the project's public star history on [Star History](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src).
 
 ## Documentation
 
