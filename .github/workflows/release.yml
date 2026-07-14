@@ -56,7 +56,7 @@ jobs:
           dotnet publish src/GhostTrace.CLI/GhostTrace.CLI.csproj
           --configuration ${{ env.CONFIGURATION }}
           --runtime ${{ env.RUNTIME_ID }}
-          --self-contained false
+          --self-contained true
           -p:GhostTraceVersion=${{ env.PROJECT_VERSION }}
           --output artifacts/publish/GhostTrace.CLI/${{ env.RUNTIME_ID }}
 
@@ -93,7 +93,6 @@ jobs:
 
             ### Requisitos
             - Windows 10/11 x64
-            - .NET 10 Desktop Runtime
             - Executar como Administrador (UAC necessário)
           files: |
             ${{ github.workspace }}/src/GhostTrace.Installer/bin/x64/Release/en-US/GhostTrace-${{ env.PROJECT_VERSION }}-x64.msi

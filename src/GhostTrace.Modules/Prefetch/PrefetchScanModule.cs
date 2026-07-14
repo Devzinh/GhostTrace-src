@@ -19,7 +19,7 @@ public sealed class PrefetchScanModule : IScanModule
     private static readonly string PrefetchDir =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Prefetch");
 
-    public Task<IScanResult> RunAsync(IScanContext context, CancellationToken cancellationToken = default)
+    public async Task<IScanResult> RunAsync(IScanContext context, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -28,12 +28,12 @@ public sealed class PrefetchScanModule : IScanModule
 
         if (!Directory.Exists(PrefetchDir))
         {
-            return Task.FromResult(builder
+            return builder
                 .AddError($"Prefetch directory not found at {PrefetchDir}")
                 .ForceStatus(ScanStatus.Failure)
                 .SetMetadata("TotalFiles", 0).SetMetadata("TotalParsed", 0)
                 .SetMetadata("TotalErrors", 0).SetMetadata("TotalSkipped", 0)
-                .Build());
+                .Build();
         }
 
         string[] files;
@@ -43,12 +43,12 @@ public sealed class PrefetchScanModule : IScanModule
         }
         catch (Exception ex)
         {
-            return Task.FromResult(builder
+            return builder
                 .AddError($"Error accessing Prefetch directory: {ex.Message}")
                 .ForceStatus(ScanStatus.Failure)
                 .SetMetadata("TotalFiles", 0).SetMetadata("TotalParsed", 0)
                 .SetMetadata("TotalErrors", 1).SetMetadata("TotalSkipped", 0)
-                .Build());
+                .Build();
         }
 
         foreach (var filePath in files)
@@ -58,7 +58,8 @@ public sealed class PrefetchScanModule : IScanModule
 
             try
             {
-                byte[] rawBytes = File.ReadAllBytes(filePath);
+                byte[] rawBytes = await File.ReadAllBytesAsync(filePath, cancellationToken)
+                    .ConfigureAwait(false);
                 var entry = PrefetchParser.Parse(filePath, rawBytes);
 
                 int historyCount = entry.AllRunTimesUtc is { Length: > 0 } ? entry.AllRunTimesUtc.Length - 1 : 0;
@@ -82,6 +83,10 @@ public sealed class PrefetchScanModule : IScanModule
             {
                 builder.AddError($"Parse failed for {Path.GetFileName(filePath)}: {ex.Message}");
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 builder.AddError($"Unexpected error processing {Path.GetFileName(filePath)}: {ex.Message}");
@@ -98,6 +103,6 @@ public sealed class PrefetchScanModule : IScanModule
             builder.SetMetadata("Note", "Prefetch directory empty or feature disabled");
         }
 
-        return Task.FromResult(builder.Build());
+        return builder.Build();
     }
 }

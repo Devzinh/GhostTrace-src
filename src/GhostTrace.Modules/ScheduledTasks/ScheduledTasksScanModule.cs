@@ -53,9 +53,16 @@ public sealed class ScheduledTasksScanModule : IScanModule
                           ?? throw new InvalidOperationException("Activator returned null for Schedule.Service.");
             taskService.Connect();
 
-            dynamic rootFolder = taskService.GetFolder("\\");
-            EnumerateFolder(rootFolder, builder, c, cancellationToken);
-            ReleaseComObject(rootFolder);
+            dynamic? rootFolder = null;
+            try
+            {
+                rootFolder = taskService.GetFolder("\\");
+                EnumerateFolder(rootFolder, builder, c, cancellationToken);
+            }
+            finally
+            {
+                ReleaseComObject(rootFolder);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -90,7 +97,12 @@ public sealed class ScheduledTasksScanModule : IScanModule
         ct.ThrowIfCancellationRequested();
 
         string currentFolderPath = "<unknown>";
-        try { currentFolderPath = folder.Path; } catch { }
+        try { currentFolderPath = folder.Path; }
+        catch (Exception ex)
+        {
+            builder.AddError($"Failed to read a Task Scheduler folder path: {ex.Message}");
+            c.WithError++;
+        }
 
         try
         {
@@ -172,23 +184,33 @@ public sealed class ScheduledTasksScanModule : IScanModule
             name = task.Name ?? name;
             path = task.Path ?? path;
 
-            try { stateStr = FormatTaskState((int)task.State); } catch { }
-            try { lastRun = task.LastRunTime; } catch { }
-            try { nextRun = task.NextRunTime; } catch { }
+            try { stateStr = FormatTaskState((int)task.State); }
+            catch (Exception ex) { builder.AddError($"Failed to read state for task '{path}': {ex.Message}"); }
+            try { lastRun = task.LastRunTime; }
+            catch (Exception ex) { builder.AddError($"Failed to read last run time for task '{path}': {ex.Message}"); }
+            try { nextRun = task.NextRunTime; }
+            catch (Exception ex) { builder.AddError($"Failed to read next run time for task '{path}': {ex.Message}"); }
 
             string userStr = "<unknown>";
             string actionStr = "<none>";
+            dynamic? definition = null;
             try
             {
-                dynamic? definition = task.Definition;
+                definition = task.Definition;
                 if (definition != null)
                 {
-                    userStr = ExtractUserStr(definition);
-                    actionStr = ExtractActionStr(definition);
-                    ReleaseComObject(definition);
+                    userStr = ExtractUserStr(definition, builder, path);
+                    actionStr = ExtractActionStr(definition, builder, path);
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                builder.AddError($"Failed to read definition for task '{path}': {ex.Message}");
+            }
+            finally
+            {
+                ReleaseComObject(definition);
+            }
 
             if (lastRun?.Year <= 1899) lastRun = null;
             if (nextRun?.Year <= 1899) nextRun = null;
@@ -211,30 +233,39 @@ public sealed class ScheduledTasksScanModule : IScanModule
         }
     }
 
-    private string ExtractUserStr(dynamic definition)
+    private string ExtractUserStr(dynamic definition, ScanResultBuilder builder, string taskPath)
     {
+        dynamic? principal = null;
         try
         {
-            dynamic principal = definition.Principal;
+            principal = definition.Principal;
             string user = principal.UserId ?? principal.GroupId ?? "<unknown>";
-            ReleaseComObject(principal);
             return user;
         }
-        catch { return "<unknown>"; }
+        catch (Exception ex)
+        {
+            builder.AddError($"Failed to read principal for task '{taskPath}': {ex.Message}");
+            return "<unknown>";
+        }
+        finally
+        {
+            ReleaseComObject(principal);
+        }
     }
 
-    private string ExtractActionStr(dynamic definition)
+    private string ExtractActionStr(dynamic definition, ScanResultBuilder builder, string taskPath)
     {
+        dynamic? actions = null;
+        dynamic? firstAction = null;
         try
         {
-            dynamic actions = definition.Actions;
+            actions = definition.Actions;
             if (actions.Count == 0)
             {
-                ReleaseComObject(actions);
                 return "<none>";
             }
 
-            dynamic firstAction = actions.Item(1);
+            firstAction = actions.Item(1);
             int actionType = (int)firstAction.Type;
             string actionStr = actionType switch
             {
@@ -243,11 +274,18 @@ public sealed class ScheduledTasksScanModule : IScanModule
                 _ => $"ActionType: {actionType}"
             };
 
-            ReleaseComObject(firstAction);
-            ReleaseComObject(actions);
             return actionStr;
         }
-        catch { return "<unknown>"; }
+        catch (Exception ex)
+        {
+            builder.AddError($"Failed to read action for task '{taskPath}': {ex.Message}");
+            return "<unknown>";
+        }
+        finally
+        {
+            ReleaseComObject(firstAction);
+            ReleaseComObject(actions);
+        }
     }
 
     private static string FormatTaskState(int state) => state switch

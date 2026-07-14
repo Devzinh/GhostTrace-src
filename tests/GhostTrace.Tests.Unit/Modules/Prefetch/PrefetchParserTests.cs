@@ -1,6 +1,9 @@
 using System;
 using System.Buffers.Binary;
 using System.Runtime.Versioning;
+using System.Threading;
+using System.Threading.Tasks;
+using GhostTrace.Core.Abstractions;
 using GhostTrace.Modules.Prefetch;
 using Xunit;
 
@@ -80,5 +83,23 @@ public class PrefetchParserTests
         scca[4] = 0x00; // corrupt 'SCCA'
         Assert.Throws<PrefetchFormatException>(
             () => PrefetchParser.Parse(@"C:\x\APP.EXE-1.pf", scca));
+    }
+
+    [Fact]
+    public async Task RunAsync_WithCancelledToken_StopsBeforeFilesystemAccess()
+    {
+        using var cancellationSource = new CancellationTokenSource();
+        cancellationSource.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            new PrefetchScanModule().RunAsync(new EmptyScanContext(), cancellationSource.Token));
+    }
+
+    private sealed class EmptyScanContext : IScanContext
+    {
+        public string ModuleName => "PrefetchScanModule";
+        public Guid ScanId { get; } = Guid.NewGuid();
+        public DateTimeOffset StartedAtUtc { get; } = DateTimeOffset.UtcNow;
+        public string? GetOption(string key) => null;
     }
 }

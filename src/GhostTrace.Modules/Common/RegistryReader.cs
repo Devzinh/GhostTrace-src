@@ -38,7 +38,10 @@ public static class RegistryReader
         {
             return key.GetValue(valueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         }
-        catch
+        catch (Exception ex) when (ex is System.Security.SecurityException
+                       or UnauthorizedAccessException
+                       or System.IO.IOException
+                       or ObjectDisposedException)
         {
             return null;
         }
@@ -50,7 +53,10 @@ public static class RegistryReader
         {
             return key.GetValue(valueName) is int i ? i : (int?)null;
         }
-        catch
+        catch (Exception ex) when (ex is System.Security.SecurityException
+                       or UnauthorizedAccessException
+                       or System.IO.IOException
+                       or ObjectDisposedException)
         {
             return null;
         }
@@ -62,7 +68,10 @@ public static class RegistryReader
         {
             return key.GetValue(valueName) as byte[];
         }
-        catch
+        catch (Exception ex) when (ex is System.Security.SecurityException
+                       or UnauthorizedAccessException
+                       or System.IO.IOException
+                       or ObjectDisposedException)
         {
             return null;
         }
