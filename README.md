@@ -1,6 +1,6 @@
 # GhostTrace
 
-![GhostTrace](assets/readme/hero.svg)
+![GhostTrace](assets/readme/hero.gif)
 
 > **Find what software left behind on Windows, before it finds its way back.**
 
