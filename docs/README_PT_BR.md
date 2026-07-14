@@ -1,5 +1,3 @@
-# GhostTrace
-
 ![GhostTrace](../assets/readme/hero.gif)
 
 > **Encontre os rastros que um software deixou no Windows, antes que eles voltem a incomodar.**
