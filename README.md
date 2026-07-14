@@ -2,158 +2,176 @@
 
 ![GhostTrace](assets/readme/hero.svg)
 
-**Investigacao local de rastros de software no Windows, com coleta forense, relatorios auditaveis e limpeza estritamente opt-in.**
+> **Find what software left behind on Windows, before it finds its way back.**
 
-[Primeiros passos](#primeiros-passos) | [Capacidades](#capacidades) | [Seguranca](#seguranca-forense) | [Documentacao](#documentacao) | [Roadmap](docs/roadmap.md)
+GhostTrace is a local Windows forensic trace hunter for incident responders, system administrators, and security-minded power users. It maps persistence, execution, activity, and leftover artifacts into a reviewable record, then offers tightly constrained cleanup only when you explicitly choose it.
 
-[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace?style=flat-square&label=release&color=1F8FFF)](../../releases/latest)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-1F8FFF?style=flat-square)
-![Runtime](https://img.shields.io/badge/runtime-.NET%2010-17B47E?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-F39C3D?style=flat-square)
+[![CI](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace-src?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace-src/releases/latest)
+![Windows](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-1F8FFF?style=flat-square)
+![.NET](https://img.shields.io/badge/.NET-10-17B47E?style=flat-square)
+[![License](https://img.shields.io/badge/license-MIT-F39C3D?style=flat-square)](LICENSE)
+
+**[Download](https://github.com/Devzinh/GhostTrace-src/releases/latest)** | **[Quick start](#quick-start)** | **[Capabilities](#what-it-collects)** | **[Safety model](#forensic-safety)** | **[Roadmap](docs/roadmap.md)** | **[Portuguese (Brazil)](docs/README_PT_BR.md)**
 
 ---
 
-GhostTrace ajuda analistas e administradores a responder uma pergunta simples: **o que ainda ficou no sistema depois que um software foi removido?**
+## Why GhostTrace
 
-Em uma unica execucao, a ferramenta coleta evidencia de persistencia, execucao, atividade de usuario e artefatos do sistema. Ela apresenta os achados por modulo, permite exportar registros locais e so oferece remocao para candidatos com regras de confianca restritas.
+Uninstalling an application does not always remove its operational footprint. Startup entries, scheduled tasks, cached execution evidence, registry values, services, and folders can remain long after the installer reports success.
 
-> GhostTrace nao classifica um achado como prova conclusiva de comprometimento. Ele preserva e organiza evidencia para a sua analise.
+GhostTrace turns that broad question into a focused, local investigation:
 
-## Primeiros passos
+- **One focused hunt** across 22 forensic modules.
+- **Evidence by source**, with findings, errors, and metadata kept per module.
+- **Offline by design**, with no telemetry, uploads, or cloud dependency.
+- **Audit-ready output**, including TXT records, JSON outputs for directed collectors, and cleanup logs.
+- **Human-controlled cleanup**, never automatic remediation.
 
-### 1. Instale
+![GhostTrace running in the terminal](assets/readme/demo.gif)
 
-Baixe o instalador mais recente em [Releases](../../releases/latest):
+## Quick start
+
+### Install
+
+Download the latest x64 MSI from [Releases](https://github.com/Devzinh/GhostTrace-src/releases/latest):
 
 ```text
 GhostTrace-<version>-x64.msi
 ```
 
-O pacote e **self-contained**, portanto nao requer a instalacao previa do runtime .NET na maquina alvo. O GhostTrace deve ser executado como administrador para coletar artefatos protegidos do Windows.
+The package is self-contained, so the target machine does not need a pre-installed .NET runtime. Run GhostTrace as Administrator to access protected Windows artifacts.
 
-### 2. Investigue um nome
+### Hunt a software name
 
 ```powershell
 GhostTrace.CLI scan --name nvidia
 ```
 
-O modo interativo exibe o progresso, consolida os achados e permite exportar o relatorio. Quando existirem residuos elegiveis, a limpeza e opcional e exige selecao explicita seguida de confirmacao textual.
+The interactive flow shows progress, groups findings by technique, and can export a record of the investigation. If safe cleanup candidates exist, you must select them and type a confirmation phrase before any removal occurs.
 
-### 3. Automatize uma coleta
+### Run it in automation
 
 ```powershell
 GhostTrace.CLI scan --name nvidia --quiet --output C:\Cases\Host1
 ```
 
-O modo `--quiet` nao abre prompts e grava o relatorio TXT no diretorio indicado. Se o relatorio nao puder ser persistido, o comando retorna um codigo de erro.
+`--quiet` creates a non-interactive TXT record. A report write failure returns a non-zero exit code, so automation does not silently succeed without an artifact.
 
-### Comandos principais
+### Essential commands
 
-| Objetivo | Comando |
+| Goal | Command |
 | --- | --- |
-| Abrir o menu interativo | `GhostTrace.CLI` |
-| Fazer triagem sem filtro | `GhostTrace.CLI scan` |
-| Procurar rastros de um software | `GhostTrace.CLI scan --name <nome>` |
-| Coletar para automacao | `GhostTrace.CLI scan --name <nome> --quiet --output <diretorio>` |
-| Correlacionar tarefas COM e TaskCache | `GhostTrace.CLI scan-tasks-correlate-json --output <arquivo.json>` |
-| Coletar diretorio, Registro ou Event Log | `scan-fs-json`, `scan-reg-json`, `scan-evt-json` |
+| Open the interactive menu | `GhostTrace.CLI` |
+| Run a full triage | `GhostTrace.CLI scan` |
+| Hunt a named application | `GhostTrace.CLI scan --name <name>` |
+| Write a script-friendly scan record | `GhostTrace.CLI scan --name <name> --quiet --output <directory>` |
+| Correlate Task Scheduler COM and TaskCache | `GhostTrace.CLI scan-tasks-correlate-json --output <report.json>` |
+| Inspect a directory, Registry key, or Event Log | `scan-fs-json`, `scan-reg-json`, `scan-evt-json` |
 
-Para definir outro idioma da interface, passe `--lang` antes ou depois do comando:
+Choose the interface language with `--lang`:
 
 ```powershell
 GhostTrace.CLI scan --name nvidia --lang en
-GhostTrace.CLI --lang es
+GhostTrace.CLI --lang pt-BR
 ```
 
-## O que a coleta entrega
+## From collection to review
 
-![Fluxo de investigacao](assets/readme/workflow.svg)
+![GhostTrace investigation workflow](assets/readme/workflow.svg)
 
-1. Executa os modulos forenses disponiveis para o tipo de coleta escolhido.
-2. Mantem findings, erros e metadados separados por modulo.
-3. Exibe um resumo local e permite exportar um registro de texto ou JSON nos comandos direcionados.
-4. Opcionalmente registra qualquer acao de limpeza em um log separado.
+1. GhostTrace runs the modules available for the selected collection.
+2. Each module returns its own findings, errors, and metadata.
+3. The CLI renders a concise summary and writes a local record when requested.
+4. Any selected cleanup operation is written to a separate audit log.
 
-![Cobertura de modulos](assets/readme/modules.svg)
+## What it collects
 
-## Capacidades
+![GhostTrace module coverage](assets/readme/modules.svg)
 
-| Area | Evidencia coletada |
+| Area | Evidence sources |
 | --- | --- |
-| Persistencia | Run/RunOnce, Startup, servicos, Winlogon, IFEO, AppInit, LSA, Active Setup, WMI e tarefas agendadas |
-| Execucao | Prefetch, Shimcache, BAM/DAM, UserAssist e MUICache |
-| Atividade | Historico PowerShell, RDP, RecentDocs, USB e redes conhecidas |
-| Sistema e instalacao | Entradas de uninstall, StartupApproved e residuos em Program Files, ProgramData e AppData |
-| Correlacao | Divergencias entre Task Scheduler COM e TaskCache para investigacao de Ghost Tasks (T1053.005) |
+| Persistence | Run/RunOnce, Startup, services, Winlogon, IFEO, AppInit, LSA, Active Setup, WMI, and scheduled tasks |
+| Execution | Prefetch, Shimcache, BAM/DAM, UserAssist, and MUICache |
+| User activity | PowerShell history, outbound RDP history, RecentDocs, USB, and network artifacts |
+| Installed software and leftovers | Uninstall entries, StartupApproved, Program Files, ProgramData, and AppData traces |
+| Scheduled task correlation | COM and TaskCache discrepancies used to investigate Ghost Tasks (T1053.005) |
 
-### Modulos de persistencia
+### Persistence modules
 
-| Modulo | Tecnica ou fonte |
+| Module | Source |
 | --- | --- |
-| `PersistenceScanModule` | Run/RunOnce e pastas Startup |
-| `ServicesScanModule` | Servicos e drivers com `ImagePath` |
-| `AsepScanModule` | Winlogon, IFEO, AppInit, LSA e Active Setup |
-| `ScheduledTasksScanModule` | Task Scheduler COM, incluindo tarefas ocultas |
-| `TaskCacheScanModule` | `TaskCache\Tree` e anomalias de tarefas |
-| `WmiPersistenceScanModule` | `__EventFilter`, `__EventConsumer` e bindings |
+| `PersistenceScanModule` | Run/RunOnce and Startup folders |
+| `ServicesScanModule` | Service and driver `ImagePath` values |
+| `AsepScanModule` | Winlogon, IFEO, AppInit, LSA, and Active Setup |
+| `ScheduledTasksScanModule` | Task Scheduler COM, including hidden tasks |
+| `TaskCacheScanModule` | `TaskCache\Tree` anomalies |
+| `WmiPersistenceScanModule` | `__EventFilter`, `__EventConsumer`, and bindings |
 
-### Modulos de execucao e atividade
+### Execution and activity modules
 
-| Modulo | Fonte |
+| Module | Source |
 | --- | --- |
-| `PrefetchScanModule` | Arquivos `.pf` Windows 10/11, incluindo XPRESS-Huffman |
+| `PrefetchScanModule` | Windows 10/11 `.pf` files, including XPRESS-Huffman compression |
 | `ShimcacheScanModule` | AppCompatCache |
-| `BamScanModule` | BAM/DAM por SID |
-| `UserAssistScanModule` | Execucoes GUI e contagens de uso |
-| `MuiCacheScanModule` | MUICache do shell |
-| `PowerShellHistoryScanModule` | PSReadLine e sinais de comandos suspeitos |
-| `RdpConnectionScanModule` | Historico de conexoes RDP de saida |
-| `RecentDocsScanModule` | RecentDocs do Explorer |
-| `UsbDeviceScanModule` | Historico USBSTOR |
-| `NetworkArtifactsScanModule` | Hosts e perfis de rede |
+| `BamScanModule` | BAM/DAM records by SID |
+| `UserAssistScanModule` | GUI launches and usage counts |
+| `MuiCacheScanModule` | Shell MUICache |
+| `PowerShellHistoryScanModule` | PSReadLine history and suspicious command signals |
+| `RdpConnectionScanModule` | Outbound RDP connection history |
+| `RecentDocsScanModule` | Explorer RecentDocs |
+| `UsbDeviceScanModule` | USBSTOR history |
+| `NetworkArtifactsScanModule` | Hosts file and known network profiles |
 
-## Seguranca forense
+## Forensic safety
 
-O comportamento padrao do GhostTrace e **somente leitura**. A limpeza existe para residuos de software, nao para remediacao automatica de malware.
+GhostTrace is a **read-only collector by default**. Its cleanup workflow targets software leftovers, not automatic malware remediation.
 
-- A coleta nao transmite dados e nao depende de servicos cloud.
-- A limpeza nunca e preselecionada: exige escolha manual e uma palavra de confirmacao.
-- Caches de execucao e historicos permanecem fora da limpeza para preservar evidencia.
-- Diretorios so podem ser removidos se forem filhos diretos de roots confiaveis, se seu nome corresponder exatamente ao alvo e se nao forem junctions ou symlinks.
-- Correspondencias parciais viram `FilesystemTraceHint`: aparecem no relatorio, mas nao sao candidatas a remocao.
-- Relatorios JSON sao gravados atomicamente; um arquivo existente so e substituido depois que a nova escrita termina.
-- `Ctrl+C` cancela cooperativamente a correlacao de tarefas e a leitura de Prefetch.
+- No network calls, telemetry, evidence upload, or cloud account is required.
+- Cleanup starts with no preselected item and requires explicit selection plus typed confirmation.
+- Execution caches and activity histories are never cleanup candidates.
+- A directory is removable only when it is directly under a trusted root, exactly matches the target name, and is not a junction or symlink.
+- Partial name matches become `FilesystemTraceHint`: reportable, never removable.
+- JSON reports are written atomically, preserving an existing report until a replacement completes.
+- `Ctrl+C` cooperatively cancels scheduled-task correlation and Prefetch file reading.
 
-## Saidas e interpretacao
+> A finding is evidence, not a verdict. Interpret it with the host timeline, your environment, and your incident-response process.
 
-| Saida | Quando usar |
+## Outputs that fit the investigation
+
+| Output | Best for |
 | --- | --- |
-| Tabela interativa | Triagem manual e revisao rapida dos achados |
-| Relatorio TXT | Registro local do comando `scan`, inclusive em automacao com `--quiet` |
-| Relatorio JSON | Integracao e processamento de coletores direcionados ou correlacao de tarefas |
-| Log de limpeza | Auditoria de itens realmente removidos, ignorados ou com erro |
+| Interactive table | Fast analyst review |
+| TXT report | Local record from `scan`, including `--quiet` automation |
+| JSON report | Directed collectors and scheduled-task correlation |
+| Cleanup log | Auditing removed, skipped, and failed cleanup actions |
 
-Um status `PartialSuccess` significa que pelo menos um modulo produziu achados, mas tambem reportou uma limitacao. Consulte os erros do modulo antes de concluir que a fonte esta limpa.
+`PartialSuccess` means a module produced findings but also encountered a limitation. Read that module's errors before treating an absent result as a clean source.
 
-## Qualidade
+## Built to be trusted
 
-- Pull requests executam restore, build e testes em Windows com .NET 10.
-- O gate de release testa toda a `GhostTrace.sln` antes de construir o MSI.
-- `src/GhostTrace.Tests` e `tests/GhostTrace.Tests.Unit` fazem parte da solucao e da CI.
-- Releases estaveis aceitam apenas tags no formato `v<major>.<minor>.<patch>`.
-- A distribuicao e licenciada sob [MIT](LICENSE).
+- Pull requests restore, build, and test on Windows with .NET 10.
+- The release gate tests the full `GhostTrace.sln` before building the MSI.
+- Both `src/GhostTrace.Tests` and `tests/GhostTrace.Tests.Unit` are included in the solution and CI.
+- Stable releases accept only `v<major>.<minor>.<patch>` tags.
+- GhostTrace is released under the [MIT License](LICENSE).
 
-## Documentacao
+## Star history
 
-- [Playbook de correlacao de tarefas agendadas](docs/playbooks/scheduled-tasks-correlation.md)
-- [Roadmap de melhorias](docs/roadmap.md)
-- [Decisoes de UX e arquitetura](docs/design/ux-architecture-decisions.md)
-- [Guia dos projetos de teste](tests/README.md)
+[![Star History Chart](https://api.star-history.com/svg?repos=Devzinh/GhostTrace-src&type=Date)](https://www.star-history.com/#Devzinh/GhostTrace-src&Date)
 
-## Contribuindo
+## Documentation
 
-Mantenha os modulos de coleta read-only, propague `CancellationToken`, reporte lacunas de cobertura no resultado e inclua testes antes de abrir uma PR. O [roadmap](docs/roadmap.md) lista as proximas areas com maior impacto.
+- [Scheduled Tasks Correlation Playbook](docs/playbooks/scheduled-tasks-correlation.md)
+- [Product roadmap](docs/roadmap.md)
+- [UX and architecture decisions](docs/design/ux-architecture-decisions.md)
+- [Test project guide](tests/README.md)
+- [README in Portuguese (Brazil)](docs/README_PT_BR.md)
+
+## Contributing
+
+Contributions are welcome. Keep collectors read-only, propagate `CancellationToken`, surface coverage gaps as result errors, and include tests with behavior changes. The [roadmap](docs/roadmap.md) highlights the next high-impact areas.
 
 ---
 
-GhostTrace e uma ferramenta de apoio a investigacao. Valide cada achado no contexto do host, da linha do tempo e das politicas do seu ambiente.
+GhostTrace supports investigation. Validate every artifact in the context of the host, its timeline, and your operating procedures.
