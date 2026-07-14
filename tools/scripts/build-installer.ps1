@@ -20,12 +20,26 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$repoRoot     = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+$cliProject = Join-Path $repoRoot 'src\GhostTrace.CLI\GhostTrace.CLI.csproj'
+
+if (-not (Test-Path $cliProject)) {
+    $nestedRepoRoots = Get-ChildItem -Path $repoRoot -Directory |
+        Where-Object { Test-Path (Join-Path $_.FullName 'src\GhostTrace.CLI\GhostTrace.CLI.csproj') }
+
+    if ($nestedRepoRoots.Count -ne 1) {
+        throw "Could not locate the GhostTrace repository root from '$PSScriptRoot'."
+    }
+
+    $repoRoot = $nestedRepoRoots[0].FullName
+    $cliProject = Join-Path $repoRoot 'src\GhostTrace.CLI\GhostTrace.CLI.csproj'
+}
+
 $publishDir   = Join-Path $repoRoot 'artifacts\publish\GhostTrace.CLI\win-x64'
 $installerDir = Join-Path $repoRoot 'artifacts\installers'
 
 Write-Host "==> Publishing GhostTrace.CLI ($Configuration, win-x64, self-contained)" -ForegroundColor Cyan
-dotnet publish (Join-Path $repoRoot 'src\GhostTrace.CLI\GhostTrace.CLI.csproj') `
+dotnet publish $cliProject `
     -c $Configuration -r win-x64 --self-contained true -o $publishDir --nologo
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed.' }
 
