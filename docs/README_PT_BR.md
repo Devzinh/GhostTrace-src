@@ -6,13 +6,13 @@
 
 GhostTrace e um caçador local de rastros forenses para Windows, feito para analistas, administradores de sistemas e pessoas que levam a seguranca do proprio ambiente a serio. Ele mapeia persistencia, execucao, atividade e residuos de software em um registro revisavel, oferecendo limpeza estritamente controlada apenas quando voce escolhe faze-la.
 
-[![CI](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace-src?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace-src/releases/latest)
+[![CI](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace/releases/latest)
 ![Windows](https://img.shields.io/badge/plataforma-Windows%2010%2F11%20x64-1F8FFF?style=flat-square)
 ![.NET](https://img.shields.io/badge/.NET-10-17B47E?style=flat-square)
 [![Licenca](https://img.shields.io/badge/licenca-MIT-F39C3D?style=flat-square)](../LICENSE)
 
-**[Download](https://github.com/Devzinh/GhostTrace-src/releases/latest)** | **[Inicio rapido](#inicio-rapido)** | **[Capacidades](#o-que-ele-coleta)** | **[Seguranca](#seguranca-forense)** | **[Roadmap](roadmap.md)** | **[English](../README.md)**
+**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Inicio rapido](#inicio-rapido)** | **[Capacidades](#o-que-ele-coleta)** | **[Seguranca](#seguranca-forense)** | **[Roadmap](roadmap.md)** | **[English](../README.md)**
 
 ---
 
@@ -28,7 +28,7 @@ Em uma unica execucao, a ferramenta coleta evidencia de persistencia, execucao, 
 
 ### Instale
 
-Baixe o MSI x64 mais recente em [Releases](https://github.com/Devzinh/GhostTrace-src/releases/latest):
+Baixe o MSI x64 mais recente em [Releases](https://github.com/Devzinh/GhostTrace/releases/latest):
 
 ```text
 GhostTrace-<version>-x64.msi
@@ -152,10 +152,10 @@ GhostTrace e um coletor **somente leitura por padrao**. A limpeza foi desenhada 
 
 ## Historico de estrelas
 
-[![Estrelas no GitHub](https://img.shields.io/github/stars/Devzinh/GhostTrace-src?style=flat-square&label=estrelas%20no%20GitHub)](https://github.com/Devzinh/GhostTrace-src/stargazers)
-[![Star History](https://img.shields.io/badge/Star%20History-ver%20crescimento-1F8FFF?style=flat-square)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+[![Estrelas no GitHub](https://img.shields.io/github/stars/Devzinh/GhostTrace?style=flat-square&label=estrelas%20no%20GitHub)](https://github.com/Devzinh/GhostTrace/stargazers)
+[![Star History](https://img.shields.io/badge/Star%20History-ver%20crescimento-1F8FFF?style=flat-square)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace)
 
-Acompanhe o historico publico de estrelas no [Star History](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src).
+Acompanhe o historico publico de estrelas no [Star History](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace).
 
 ## Documentacao
 
