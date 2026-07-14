@@ -158,7 +158,7 @@ GhostTrace is a **read-only collector by default**. Its cleanup workflow targets
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Devzinh/GhostTrace-src&type=Date)](https://www.star-history.com/#Devzinh/GhostTrace-src&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Devzinh/GhostTrace-src&type=Date)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
 
 ## Documentation
 
