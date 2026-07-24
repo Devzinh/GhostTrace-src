@@ -4,7 +4,13 @@
 
 O GhostTrace é um caçador de vestígios forenses locais no Windows para analistas de resposta a incidentes, administradores de sistema e usuários avançados focados em segurança. Ele mapeia persistência, execução, atividade e artefatos remanescentes em um registro auditável, oferecendo depois uma limpeza estritamente controlada apenas quando você escolher explicitamente.
 
-**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Requisitos](https://www.google.com/search?q=%23requisitos)** | **[Início rápido](https://www.google.com/search?q=%23in%C3%ADcio-r%C3%A1pido)** | **[Capacidades](https://www.google.com/search?q=%23o-que-ele-coleta)** | **[Segurança forense](https://www.google.com/search?q=%23seguran%C3%A7a-forense)** | **[Roadmap](https://www.google.com/search?q=docs/roadmap.md)** | **[Inglês](https://www.google.com/search?q=docs/README)**
+[![CI](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace/releases/latest)
+![Windows](https://img.shields.io/badge/plataforma-Windows%2010%2F11%20x64-1F8FFF?style=flat-square)
+![.NET](https://img.shields.io/badge/.NET-10-17B47E?style=flat-square)
+[![Licença](https://img.shields.io/badge/licença-MIT-F39C3D?style=flat-square)](../LICENSE)
+
+**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Requisitos](#requisitos)** | **[Início rápido](#início-rápido)** | **[Capacidades](#o-que-ele-coleta)** | **[Segurança forense](#segurança-forense)** | **[Roadmap](roadmap.md)** | **[English](../README.md)**
 
 ---
 
@@ -14,11 +20,11 @@ Desinstalar um aplicativo nem sempre remove sua pegada operacional. Entradas de 
 
 O GhostTrace transforma essa questão abrangente em uma investigação local e focada:
 
-* **Uma varredura focada** em  NN módulos forenses.
-* **Evidências por fonte**, com achados, erros e metadados mantidos por módulo.
-* **Offline por design**, sem telemetria, uploads ou dependência de nuvem.
-* **Saída pronta para auditoria**, incluindo registros em TXT, saídas em JSON para coletores direcionados e logs de limpeza.
-* **Limpeza controlada por humanos**, nunca remediação automática.
+- **Uma varredura focada** em <!-- CONFIRME: número real de módulos, deve bater com as tabelas abaixo e com a versão em inglês --> NN módulos forenses.
+- **Evidências por fonte**, com achados, erros e metadados mantidos por módulo.
+- **Offline por design**, sem telemetria, uploads ou dependência de nuvem.
+- **Saída pronta para auditoria**, incluindo registros em TXT, saídas em JSON para coletores direcionados e logs de limpeza.
+- **Limpeza controlada por humanos**, nunca remediação automática.
 
 ## Requisitos
 
@@ -27,7 +33,7 @@ O GhostTrace transforma essa questão abrangente em uma investigação local e f
 | Sistema operacional | Windows 10 ou 11, x64 |
 | Privilégios | Administrador, necessário para ler artefatos protegidos |
 | Runtime | Nenhum. O MSI é autônomo (*self-contained*). |
-| Disco |  ~NN MB instalado, mais espaço para a saída do relatório |
+| Disco | <!-- CONFIRME --> ~NN MB instalado, mais espaço para a saída do relatório |
 
 ## Verifique seu download
 
@@ -35,10 +41,11 @@ O GhostTrace lê artefatos protegidos do Windows e executa com privilégios elev
 
 ```powershell
 Get-FileHash .\GhostTrace-1.5.0-x64.msi -Algorithm SHA256
-
 ```
 
 Compare o resultado com o arquivo `SHA256SUMS.txt` publicado em cada release.
+
+<!-- CONFIRME: publique o SHA256SUMS.txt junto de cada release, senão remova o bloco acima -->
 
 O instalador ainda não possui assinatura de código (*code-signing*), portanto o SmartScreen e alguns produtos de EDR podem sinalizá-lo na primeira execução. Verifique o hash em vez de apenas ignorar o aviso.
 
@@ -50,7 +57,6 @@ Baixe o MSI x64 mais recente em [Releases](https://github.com/Devzinh/GhostTrace
 
 ```text
 GhostTrace-<version>-x64.msi
-
 ```
 
 O pacote é autônomo, portanto a máquina de destino não precisa de um runtime .NET pré-instalado. Execute o GhostTrace como Administrador para acessar artefatos protegidos do Windows.
@@ -59,7 +65,6 @@ O pacote é autônomo, portanto a máquina de destino não precisa de um runtime
 
 ```powershell
 GhostTrace.CLI scan --name nvidia
-
 ```
 
 O fluxo interativo mostra o progresso, agrupa os achados por técnica e pode exportar um registro da investigação. Se existirem candidatos seguros para limpeza, você deve selecioná-los e digitar uma frase de confirmação antes que qualquer remoção ocorra.
@@ -82,14 +87,16 @@ $ GhostTrace.CLI scan --name nvidia
       \NvProfileUpdaterOnLogon_{...}
 
   TaskCacheScanModule: PartialSuccess. 2 keys unreadable (access denied).
-
 ```
+
+<!-- CONFIRME: substitua pelo output real de uma execução sua, redigido. Se a CLI traduz a saída com --lang pt-BR, use aqui a saída em português. -->
+
+![GhostTrace em execução no terminal](../assets/readme/demo.gif)
 
 ### Executar em automação
 
 ```powershell
 GhostTrace.CLI scan --name nvidia --quiet --output C:\Cases\Host1
-
 ```
 
 O parâmetro `--quiet` cria um registro TXT não interativo. Falhas na gravação do relatório retornam um código de saída diferente de zero, garantindo que a automação não passe silenciosamente sem gerar um artefato.
@@ -110,10 +117,11 @@ Escolha o idioma da interface com `--lang`:
 ```powershell
 GhostTrace.CLI scan --name nvidia --lang en
 GhostTrace.CLI --lang pt-BR
-
 ```
 
 ### Códigos de saída
+
+<!-- CONFIRME: ajuste para os códigos reais implementados, mantendo idênticos aos da versão em inglês -->
 
 | Código | Significado |
 | --- | --- |
@@ -123,6 +131,8 @@ GhostTrace.CLI --lang pt-BR
 | `3` | Cancelado pelo operador |
 
 ## Da coleta à revisão
+
+![Fluxo de investigação do GhostTrace](../assets/readme/workflow.svg)
 
 1. O GhostTrace executa os módulos disponíveis para a coleta selecionada.
 2. Cada módulo retorna seus próprios achados, erros e metadados.
@@ -138,6 +148,11 @@ GhostTrace.CLI --lang pt-BR
 | Atividade do usuário | Histórico do PowerShell, histórico de RDP de saída, RecentDocs, USB e artefatos de rede |
 | Software instalado e vestígios | Entradas de desinstalação, StartupApproved, vestígios em Program Files, ProgramData e AppData |
 | Correlação de tarefas agendadas | Discrepâncias entre COM e TaskCache usadas para investigar Ghost Tasks (T1053.005) |
+
+![Cobertura de módulos do GhostTrace](../assets/readme/modules.svg)
+
+<details>
+<summary>Referência de módulos (nomes internos dos coletores)</summary>
 
 **Persistência**
 
@@ -165,26 +180,30 @@ GhostTrace.CLI --lang pt-BR
 | `UsbDeviceScanModule` | Histórico do USBSTOR |
 | `NetworkArtifactsScanModule` | Arquivo hosts e perfis de rede conhecidos |
 
+<!-- CONFIRME: complete com os módulos restantes de "Software instalado e vestígios" para fechar a contagem declarada no topo -->
+
+</details>
+
 ## Segurança forense
 
 O GhostTrace é um **coletor somente leitura por padrão**. Seu fluxo de trabalho de limpeza é focado em vestígios de software, não em remediação automática de malware.
 
-* Nenhuma chamada de rede, telemetria, envio de evidências ou conta em nuvem é necessária.
-* A limpeza começa sem nenhum item pré-selecionado e exige seleção explícita mais confirmação digitada.
-* Caches de execução e históricos de atividade nunca são candidatos à limpeza.
-* Um diretório só é removível quando estiver diretamente sob uma raiz confiável, corresponder exatamente ao nome do alvo e não for um *junction* ou *symlink*.
-* Correspondências parciais de nome tornam-se `FilesystemTraceHint`: reportáveis, mas nunca removíveis.
-* Relatórios JSON são gravados de forma atômica, preservando o relatório existente até que a substituição seja concluída.
-* `Ctrl+C` cancela de forma cooperativa a correlação de tarefas agendadas e a leitura de arquivos Prefetch.
+- Nenhuma chamada de rede, telemetria, envio de evidências ou conta em nuvem é necessária.
+- A limpeza começa sem nenhum item pré-selecionado e exige seleção explícita mais confirmação digitada.
+- Caches de execução e históricos de atividade nunca são candidatos à limpeza.
+- Um diretório só é removível quando estiver diretamente sob uma raiz confiável, corresponder exatamente ao nome do alvo e não for um *junction* ou *symlink*.
+- Correspondências parciais de nome tornam-se `FilesystemTraceHint`: reportáveis, mas nunca removíveis.
+- Relatórios JSON são gravados de forma atômica, preservando o relatório existente até que a substituição seja concluída.
+- `Ctrl+C` cancela de forma cooperativa a correlação de tarefas agendadas e a leitura de arquivos Prefetch.
 
 > Um achado é uma evidência, não um veredito. Interprete-o juntamente com a linha do tempo do host, seu ambiente e seu processo de resposta a incidentes.
 
-### O que o GhostTrace NÃO é
+### O que o GhostTrace não é
 
-* Não é um antivírus nem uma ferramenta de remediação de malware.
-* Não é uma ferramenta de computação forense de memória. Ele lê apenas artefatos de disco e do Registro.
-* Não é um coletor remoto. Ele inspeciona o host local.
-* Não é um motor de vereditos. Ele reporta evidências para que um analista as interprete.
+- Não é um antivírus nem uma ferramenta de remediação de malware.
+- Não é uma ferramenta de forense de memória. Ele lê apenas artefatos de disco e do Registro.
+- Não é um coletor remoto. Ele inspeciona o host local.
+- Não é um motor de vereditos. Ele reporta evidências para que um analista as interprete.
 
 ## Saídas adequadas para a investigação
 
@@ -199,11 +218,11 @@ O GhostTrace é um **coletor somente leitura por padrão**. Seu fluxo de trabalh
 
 ## Desenvolvido para ser confiável
 
-* Pull requests restauram, compilam e testam no Windows com .NET 10.
-* A etapa de lançamento testa a solução `GhostTrace.sln` completa antes de compilar o MSI.
-* Tanto `src/GhostTrace.Tests` quanto `tests/GhostTrace.Tests.Unit` estão incluídos na solução e no CI.
-* Versões estáveis aceitam apenas tags no formato `v<major>.<minor>.<patch>`.
-* O GhostTrace é distribuído sob a [Licença MIT](https://www.google.com/search?q=LICENSE).
+- Pull requests restauram, compilam e testam no Windows com .NET 10.
+- A etapa de lançamento testa a solução `GhostTrace.sln` completa antes de compilar o MSI.
+- Tanto `src/GhostTrace.Tests` quanto `tests/GhostTrace.Tests.Unit` estão incluídos na solução e no CI.
+- Versões estáveis aceitam apenas tags no formato `v<major>.<minor>.<patch>`.
+- O GhostTrace é distribuído sob a [Licença MIT](../LICENSE).
 
 ## Desinstalação
 
@@ -211,22 +230,21 @@ Remova o GhostTrace em **Configurações > Aplicativos > Aplicativos instalados*
 
 ```powershell
 msiexec /x GhostTrace-1.5.0-x64.msi /qn
-
 ```
 
 Relatórios e logs de limpeza gravados no seu diretório de saída não são removidos pelo desinstalador. Exclua-os manualmente após o encerramento do caso.
 
 ## Documentação
 
-* [Playbook de Correlação de Tarefas Agendadas](https://www.google.com/search?q=docs/playbooks/scheduled-tasks-correlation.md)
-* [Roadmap do produto](https://www.google.com/search?q=docs/roadmap.md)
-* [Decisões de UX e arquitetura](https://www.google.com/search?q=docs/design/ux-architecture-decisions.md)
-* [Guia do projeto de testes](https://www.google.com/search?q=tests/README.md)
-* [README em Português (Brasil)](https://www.google.com/search?q=docs/README_PT_BR.md)
+- [Playbook de Correlação de Tarefas Agendadas](playbooks/scheduled-tasks-correlation.md)
+- [Roadmap do produto](roadmap.md)
+- [Decisões de UX e arquitetura](design/ux-architecture-decisions.md)
+- [Guia do projeto de testes](../tests/README.md)
+- [README in English](../README.md)
 
 ## Contribuição
 
-Contribuições são bem-vindas. Mantenha os coletores como somente leitura, propague o `CancellationToken`, informe lacunas de cobertura como erros no resultado e inclua testes para mudanças de comportamento. O [roadmap](https://www.google.com/search?q=docs/roadmap.md) destaca as próximas áreas de alto impacto.
+Contribuições são bem-vindas. Mantenha os coletores como somente leitura, propague o `CancellationToken`, informe lacunas de cobertura como erros no resultado e inclua testes para mudanças de comportamento. O [roadmap](roadmap.md) destaca as próximas áreas de alto impacto.
 
 ---
 
