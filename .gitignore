@@ -30,3 +30,9 @@ Thumbs.db
 coverage*.json
 coverage*.xml
 *.trx
+
+# Scan output
+correlation.json
+*-report.json
+*-report.txt
+cleanup-*.log
