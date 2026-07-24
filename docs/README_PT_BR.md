@@ -4,7 +4,7 @@
 
 O GhostTrace é um caçador de vestígios forenses locais no Windows para analistas de resposta a incidentes, administradores de sistema e usuários avançados focados em segurança. Ele mapeia persistência, execução, atividade e artefatos remanescentes em um registro auditável, oferecendo depois uma limpeza estritamente controlada apenas quando você escolher explicitamente.
 
-**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Requisitos](https://www.google.com/search?q=%23requisitos)** | **[Início rápido](https://www.google.com/search?q=%23in%C3%ADcio-r%C3%A1pido)** | **[Capacidades](https://www.google.com/search?q=%23o-que-ele-coleta)** | **[Segurança forense](https://www.google.com/search?q=%23seguran%C3%A7a-forense)** | **[Roadmap](https://www.google.com/search?q=docs/roadmap.md)** | **[Português (Brasil)](https://www.google.com/search?q=docs/README_PT_BR.md)**
+**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Requisitos](https://www.google.com/search?q=%23requisitos)** | **[Início rápido](https://www.google.com/search?q=%23in%C3%ADcio-r%C3%A1pido)** | **[Capacidades](https://www.google.com/search?q=%23o-que-ele-coleta)** | **[Segurança forense](https://www.google.com/search?q=%23seguran%C3%A7a-forense)** | **[Roadmap](https://www.google.com/search?q=docs/roadmap.md)** | **[Inglês](https://www.google.com/search?q=docs/README)**
 
 ---
 
