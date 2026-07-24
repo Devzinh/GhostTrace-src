@@ -1,16 +1,16 @@
-![GhostTrace](assets/readme/hero.gif)
+# GhostTrace
 
 > **Find what software left behind on Windows, before it finds its way back.**
 
 GhostTrace is a local Windows forensic trace hunter for incident responders, system administrators, and security-minded power users. It maps persistence, execution, activity, and leftover artifacts into a reviewable record, then offers tightly constrained cleanup only when you explicitly choose it.
 
-[![CI](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace-src/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace-src?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace-src/releases/latest)
+[![CI](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Devzinh/GhostTrace/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Devzinh/GhostTrace?display_name=tag&sort=semver&style=flat-square)](https://github.com/Devzinh/GhostTrace/releases/latest)
 ![Windows](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-1F8FFF?style=flat-square)
 ![.NET](https://img.shields.io/badge/.NET-10-17B47E?style=flat-square)
 [![License](https://img.shields.io/badge/license-MIT-F39C3D?style=flat-square)](LICENSE)
 
-**[Download](https://github.com/Devzinh/GhostTrace-src/releases/latest)** | **[Quick start](#quick-start)** | **[Capabilities](#what-it-collects)** | **[Safety model](#forensic-safety)** | **[Roadmap](docs/roadmap.md)** | **[Portuguese (Brazil)](docs/README_PT_BR.md)**
+**[Download](https://github.com/Devzinh/GhostTrace/releases/latest)** | **[Requirements](#requirements)** | **[Quick start](#quick-start)** | **[Capabilities](#what-it-collects)** | **[Safety model](#forensic-safety)** | **[Roadmap](docs/roadmap.md)** | **[Portuguese (Brazil)](docs/README_PT_BR.md)**
 
 ---
 
@@ -20,19 +20,40 @@ Uninstalling an application does not always remove its operational footprint. St
 
 GhostTrace turns that broad question into a focused, local investigation:
 
-- **One focused hunt** across 22 forensic modules.
+- **One focused hunt** across <!-- CONFIRME: número real de módulos, deve bater com as tabelas abaixo --> NN forensic modules.
 - **Evidence by source**, with findings, errors, and metadata kept per module.
 - **Offline by design**, with no telemetry, uploads, or cloud dependency.
 - **Audit-ready output**, including TXT records, JSON outputs for directed collectors, and cleanup logs.
 - **Human-controlled cleanup**, never automatic remediation.
 
-![GhostTrace running in the terminal](assets/readme/demo.gif)
+## Requirements
+
+| Item | Requirement |
+| --- | --- |
+| Operating system | Windows 10 or 11, x64 |
+| Privileges | Administrator, required to read protected artifacts |
+| Runtime | None. The MSI is self-contained. |
+| Disk | <!-- CONFIRME --> ~NN MB installed, plus space for report output |
+
+## Verify your download
+
+GhostTrace reads protected Windows artifacts and runs elevated. Verify the installer before executing it, especially on a host you are investigating.
+
+```powershell
+Get-FileHash .\GhostTrace-1.5.0-x64.msi -Algorithm SHA256
+```
+
+Compare the result against `SHA256SUMS.txt` published with each release.
+
+<!-- CONFIRME: publique o SHA256SUMS.txt junto de cada release, senão remova o bloco acima -->
+
+The installer is not code-signed yet, so SmartScreen and some EDR products will flag it on first run. Verify the hash rather than dismissing the warning.
 
 ## Quick start
 
 ### Install
 
-Download the latest x64 MSI from [Releases](https://github.com/Devzinh/GhostTrace-src/releases/latest):
+Download the latest x64 MSI from [Releases](https://github.com/Devzinh/GhostTrace/releases/latest):
 
 ```text
 GhostTrace-<version>-x64.msi
@@ -48,6 +69,30 @@ GhostTrace.CLI scan --name nvidia
 
 The interactive flow shows progress, groups findings by technique, and can export a record of the investigation. If safe cleanup candidates exist, you must select them and type a confirmation phrase before any removal occurs.
 
+A trimmed example of what that produces:
+
+```text
+$ GhostTrace.CLI scan --name nvidia
+
+  MODULE                        FINDINGS  STATUS
+  PersistenceScanModule                2  OK
+  ScheduledTasksScanModule             1  OK
+  TaskCacheScanModule                  1  PartialSuccess
+  PrefetchScanModule                   4  OK
+
+  [Persistence] HKLM\...\Run\NvBackend
+      -> C:\Program Files\NVIDIA Corporation\Update Core\NvBackend.exe (missing)
+
+  [Ghost Task] TaskCache\Tree entry with no COM counterpart (T1053.005)
+      \NvProfileUpdaterOnLogon_{...}
+
+  TaskCacheScanModule: PartialSuccess. 2 keys unreadable (access denied).
+```
+
+<!-- CONFIRME: substitua pelo output real de uma execução sua, redigido -->
+
+![GhostTrace running in the terminal](assets/readme/demo.gif)
+
 ### Run it in automation
 
 ```powershell
@@ -62,8 +107,8 @@ GhostTrace.CLI scan --name nvidia --quiet --output C:\Cases\Host1
 | --- | --- |
 | Open the interactive menu | `GhostTrace.CLI` |
 | Run a full triage | `GhostTrace.CLI scan` |
-| Hunt a named application | `GhostTrace.CLI scan --name <name>` |
-| Write a script-friendly scan record | `GhostTrace.CLI scan --name <name> --quiet --output <directory>` |
+| Hunt a named application | `GhostTrace.CLI scan --name <n>` |
+| Write a script-friendly scan record | `GhostTrace.CLI scan --name <n> --quiet --output <directory>` |
 | Correlate Task Scheduler COM and TaskCache | `GhostTrace.CLI scan-tasks-correlate-json --output <report.json>` |
 | Inspect a directory, Registry key, or Event Log | `scan-fs-json`, `scan-reg-json`, `scan-evt-json` |
 
@@ -73,6 +118,17 @@ Choose the interface language with `--lang`:
 GhostTrace.CLI scan --name nvidia --lang en
 GhostTrace.CLI --lang pt-BR
 ```
+
+### Exit codes
+
+<!-- CONFIRME: ajuste para os códigos reais implementados -->
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Scan completed and any requested report was written |
+| `1` | Invalid arguments or unsupported environment |
+| `2` | Report write failure |
+| `3` | Cancelled by the operator |
 
 ## From collection to review
 
@@ -85,8 +141,6 @@ GhostTrace.CLI --lang pt-BR
 
 ## What it collects
 
-![GhostTrace module coverage](assets/readme/modules.svg)
-
 | Area | Evidence sources |
 | --- | --- |
 | Persistence | Run/RunOnce, Startup, services, Winlogon, IFEO, AppInit, LSA, Active Setup, WMI, and scheduled tasks |
@@ -95,7 +149,12 @@ GhostTrace.CLI --lang pt-BR
 | Installed software and leftovers | Uninstall entries, StartupApproved, Program Files, ProgramData, and AppData traces |
 | Scheduled task correlation | COM and TaskCache discrepancies used to investigate Ghost Tasks (T1053.005) |
 
-### Persistence modules
+![GhostTrace module coverage](assets/readme/modules.svg)
+
+<details>
+<summary>Module reference (internal collector names)</summary>
+
+**Persistence**
 
 | Module | Source |
 | --- | --- |
@@ -106,7 +165,7 @@ GhostTrace.CLI --lang pt-BR
 | `TaskCacheScanModule` | `TaskCache\Tree` anomalies |
 | `WmiPersistenceScanModule` | `__EventFilter`, `__EventConsumer`, and bindings |
 
-### Execution and activity modules
+**Execution and activity**
 
 | Module | Source |
 | --- | --- |
@@ -121,6 +180,10 @@ GhostTrace.CLI --lang pt-BR
 | `UsbDeviceScanModule` | USBSTOR history |
 | `NetworkArtifactsScanModule` | Hosts file and known network profiles |
 
+<!-- CONFIRME: complete com os módulos restantes de "Installed software and leftovers" para fechar a contagem declarada no topo -->
+
+</details>
+
 ## Forensic safety
 
 GhostTrace is a **read-only collector by default**. Its cleanup workflow targets software leftovers, not automatic malware remediation.
@@ -134,6 +197,13 @@ GhostTrace is a **read-only collector by default**. Its cleanup workflow targets
 - `Ctrl+C` cooperatively cancels scheduled-task correlation and Prefetch file reading.
 
 > A finding is evidence, not a verdict. Interpret it with the host timeline, your environment, and your incident-response process.
+
+### What GhostTrace is not
+
+- Not an antivirus and not a malware remediation tool.
+- Not a memory forensics tool. It reads disk and Registry artifacts only.
+- Not a remote collector. It inspects the local host.
+- Not a verdict engine. It reports evidence for an analyst to interpret.
 
 ## Outputs that fit the investigation
 
@@ -154,12 +224,15 @@ GhostTrace is a **read-only collector by default**. Its cleanup workflow targets
 - Stable releases accept only `v<major>.<minor>.<patch>` tags.
 - GhostTrace is released under the [MIT License](LICENSE).
 
-## Star history
+## Uninstall
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/Devzinh/GhostTrace-src?style=flat-square&label=GitHub%20stars)](https://github.com/Devzinh/GhostTrace-src/stargazers)
-[![Star History](https://img.shields.io/badge/Star%20History-view%20growth-1F8FFF?style=flat-square)](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src)
+Remove GhostTrace through **Settings > Apps > Installed apps**, or from an elevated prompt:
 
-Track the project's public star history on [Star History](https://www.star-history.com/?type=date&repos=Devzinh%2FGhostTrace-src).
+```powershell
+msiexec /x GhostTrace-1.5.0-x64.msi /qn
+```
+
+Reports and cleanup logs written to your output directory are not removed by the uninstaller. Delete them manually when the case is closed.
 
 ## Documentation
 
